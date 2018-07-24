@@ -1,0 +1,39 @@
+/*线性渐变，上下*/
+.gradient {
+	background: -o-linear-gradient(top, red, yellow);
+	background: -moz-linear-gradient(top, red, yellow);
+	background: -moz-linear-gradient(top, red, yellow);
+	background: -webkit-linear-gradient(top, red, yellow);
+	background: linear-gradient(top, red, yellow);
+	-ms-filter: "progid:DXImageTransform.Microsoft.gradient(GradientType=0, startColorstr=red, endColorstr=yellow)";
+	+background: #FF7A00;/*ie7*/
+	/*_background: #FF7A00;*//*ie6*/
+}
+/*线性渐变，左右*/
+.gradient {
+	background: -webkit-linear-gradient(red, yellow);
+	background: linear-gradient(red, yellow);
+}
+/*外阴影*/
+.show{
+	box-shadow: 5px 5px 1px #red;/*left top 扩散 颜色*/
+}
+/*内阴影*/
+.inseShow{
+	box-shadow:inset 5px 5px 1px #red;/*left top 扩散 颜色*/
+}
+/*文本省略*/
+.ell {
+	display: -webkit-box;
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: 2;
+	white-space: nowrap;
+	overflow: hidden;
+	text-overflow: ellipsis;
+}
+/*倒影*/
+img {
+	-webkit-box-reflect: below 0px;/*倒影*/
+	/*渐变色*/
+	-webkit-gradient(linear, left top, left bottom, from(transparent), color-stop(70%, transparent) , to(rgba(250, 250, 250, 0.1)));
+}

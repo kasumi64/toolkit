@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+<html auto='0'>
+<head>	
+	<title>toolKit测试</title>
+	<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+	<meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+	<link rel="stylesheet" type="text/css" href="css/initTag.css"/>
+	<!--<link rel="stylesheet" type="text/css" href="js/jquery-ui/v1.11.4/ui/jquery-ui-cupertino/jquery-ui-1.11.4.custom/jquery-ui.css"/>-->
+	<script id="IDkit" src="libs/simplekit.js"></script>
+	<!--<script id="IDkit" src="libs/toolkit.js"></script>-->
+	
+</head>
+<style>
+	body{ font-size: 0.3rem; line-height: 1.2; background: #ccc; overflow: hidden; }
+	.ckbtn button{ font-size: 0.3rem; color: #FFF; background: #00F; padding: 0.1rem 0.2rem; border-radius: 5px; }
+	.ckbtn button:active{ background: #F00;color: #FF0; }
+	canvas{ display: block; border: 1px solid red;}
+	.img{ width: 100px; height: 100px; border: 1px solid #FF0; background: #C7254E; }
+	#pic2{ left: -19px; top: 0px; }
+	#pp{ width: 80%; overflow-y: auto; overflow-x: scroll; font-size: 0; margin: 0 auto;
+		/*border: 1px solid #3CBAFF;*/ height: 82px;}
+	.warp{ /*width: 1000%;*/ white-space: nowrap; height: 100%;}
+	.warp div{ font-size: 0.5rem; width: 100%; height: 100%; display: inline-block; border: 1px solid #0000FF;
+		color: crimson; text-align: center; line-height: 80px; }
+</style>
+<body id="body">
+	<div class="ckbtn">
+		<button id="ck1">点击输出1</button>
+		<button id="ck2">点击输出2</button>
+	</div>
+	<div id="pp">
+		<div class="warp">
+			<div>第一个</div><div>第二个</div><div>第三个</div>
+			<div>第四个</div><div>第五个</div><div>第六个</div>
+			<div>第七个</div><div>第八个</div><div>第九个</div>
+			<div>第十个</div>
+		</div>
+	</div>
+	<div class="img"></div>
+	<p>日期</p>
+	<input type="text" id="dj" placeholder="开始日期" />
+	<input type="text" id="dj2" placeholder="结束日期" />
+	<!--<a href="#" target="_blank" rel="noopener">新页面</a>-->
+</body>
+</html>
+<script id="js1"  type="text/javascript">
+"use strict"//严格模式
+
+
+initModule(['scrollPage', 'scrollMobile'],function(require)
+{
+	var kit = require('main/kit');
+	kit.screenFix();
+	var win = window, doc = document;
+	//translate拖动
+	var dragCtrl = require('dragCtrl'),
+		div = dragCtrl('.img');
+	div.enabledRebound(false);
+	//translate滚动
+//	var dragPage = require('dragPage'),
+//		dp = dragPage('.warp', 500);
+//	dp.cyclic(true);
+//	dp.hasNavDot();
+////	dp.fxOff(true);
+//	dp.setYaxis(false);
+//	dp.useIE(true);
+	//translate自动滚动
+	var autoScroll = require('autoScroll'),
+		auto = autoScroll('.warp', 2);
+	auto.setYaxis(false);
+	auto.hasNavDot();
+//	auto.cyclic(true);
+//	auto.useIE();
+	//scroll拖动
+//	var scrollM = require('scrollMobile'),
+//		dragM = scrollM('.warp');
+//	dragM.hasNavDot();
+//	dragM.setYaxis(false);
+//	dragM.fxOff(true);
+	//scroll滚动
+//	var carousel = require('carousel'),
+//		acar = carousel('.warp',2);
+//	acar.hasNavDot();
+//	acar.setYaxis(true);
+
+
+
+	
+	kit('#ck1').click(function(){
+		
+	});
+	kit('#ck2').click(function(){
+		
+	});
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+/******************************************************************************/
+
+
+});
+
+
+function calendar()
+{
+	$.datepicker.setDefaults({
+		dateFormat: 'yymmdd',		//格式化日期
+		yearSuffix: '年', 			//年的后缀  
+        showMonthAfterYear:true,	//是否把月放在年的后面  
+        firstDay: 0,				//第一天是星期日
+        weekHeader: '周',
+     	monthNames: ['一月','二月','三月','四月','五月','六月','七月','八月','九月','十月','十一月','十二月'],
+     	dayNames: ['星期日','星期一','星期二','星期三','星期四','星期五','星期六'],
+        dayNamesShort: ['周日','周一','周二','周三','周四','周五','周六'],
+        dayNamesMin: ['日','一','二','三','四','五','六'],
+        prevText: '<上月',
+        nextText: '下月>',
+        currentText: '今天',
+	    clearText: "清除",			//清除日期的按钮名称  
+        closeText: "关闭",			//关闭选择框的按钮名称  
+	});
+	var option = {
+		showAnim: '',	//动画,Show 默认,slideDown 滑下,fadeIn淡入,blind百叶窗特效,bounce 反弹特效,clip 剪辑特效,drop 降落特效,fold 折叠特效,slide 滑动特效,""无;
+		showOtherMonths: true,		//显示其他月份的日期
+		selectOtherMonths: true,	//可选其他月份的日期
+		numberOfMonths: 1,			//多个月份
+		showButtonPanel: true,		//显示按钮栏
+//   	minDate: '-7d',				//最大
+     	maxDate: 'D',				//最小
+        onSelect: function(selectedDate, dp) {//选择日期后执行的操作  
+//          console.log(selectedDate, dp);
+            var day, hour, today, selected, later, obj,
+            	future, year, month, days;
+            obj = {minDate: selectedDate};
+            day = 86400000; hour = 3600000; today = new Date();
+			selected = new Date(dp.currentYear, dp.currentMonth, dp.currentDay).getTime();
+            today = today.getTime() - today.getHours() * hour;
+            later = selected + day * 6;
+            if(later < today){
+            	future = new Date(later);
+        		year = future.getFullYear();
+        		month = future.getMonth()+1;
+        		days = future.getDate();
+            	if(month < 10) month = '0' + month;
+            	if(days < 10) days = '0' + days;
+            	obj.maxDate = year+month+days+'';
+            	log(selectedDate, obj.maxDate)
+            } else obj.maxDate = 'D';
+            $("#dj2").datepicker('option', obj);
+        },
+//   	onClose: function( selectedDate ) {//关闭日期后执行的操作  
+//   		console.log(selectedDate);
+//	    },
+	    
+//	    altField: "#alternate",		//填充另一个输入框ID
+//   	altFormat: "DD, d MM, yy",	//另一个输入框格式化日期
+//	    showWeek: true,				//第几周
+//  	changeMonth: true,			//月份菜单
+//		changeYear: true,			//年份菜单
+//   	showOn: "button",			//图标触发器
+//		buttonImage: "img/ycServe01.png",//图标触发器
+//		buttonImageOnly: true		//图标触发器
+	};
+	$("#dj").datepicker(option);
+	delete option.onSelect;
+	$("#dj2").datepicker(option);
+}
+/*	var js = 'js/plugins/';
+	kit.loadScript([
+		'js/jquery-2.2.0.js',
+		js+'simpleDragPage.js',
+		js+'scrollPage.js',
+		js+'getDate.js',
+		'js/jquery-ui/v1.11.4/jquery-ui.js'
+	]);*/
+</script>

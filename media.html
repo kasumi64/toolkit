@@ -1,0 +1,282 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0, user-scalable=no"/>
+	<title>媒体播放器</title>
+	<link href="css/initTag.css" rel="stylesheet" type="text/css" />
+	<style>
+		.audioPlayer{ width: 6.0rem; margin: 0 auto; border: 1px solid coral; border-radius: 5px; padding: 0.2rem; font-size: 0; }
+		.music_info{ white-space: nowrap; line-height: 1.2; border-bottom: 1px solid yellowgreen; padding-bottom: 0.2rem; }
+		.music_head,.music_txt{display: inline-block;vertical-align: top;}
+		.music_avatar{ width: 1.6rem; height: 1.6rem; border: 1px solid skyblue; border-radius: 50%; overflow: hidden;/*transition: all 1s;*/
+				vertical-align: middle; -webkit-animation: rotary 5s linear infinite;animation: rotary 5s linear infinite;}
+		@-webkit-keyframes rotary {
+			0% {-webkit-transform: rotate(0deg);-ms-transform: rotate(0deg);-o-transform: rotate(0deg);transform: rotate(0deg);}
+			100% {-webkit-transform: rotate(360deg);-ms-transform: rotate(360deg);-o-transform: rotate(360deg);transform: rotate(360deg);}
+		}
+		@keyframes rotary {
+			0% {-webkit-transform: rotate(0deg);-ms-transform: rotate(0deg);-o-transform: rotate(0deg);transform: rotate(0deg);}
+			100% {-webkit-transform: rotate(360deg);-ms-transform: rotate(360deg);-o-transform: rotate(360deg);transform: rotate(360deg);}
+		}
+		/*.avatar:hover{-webkit-transform: rotate(1turn);transform: rotate(1turn);}*/
+		/*文本*/
+		.music_txt{ width: 3.9rem;padding: 0.2rem 0 0 0.2rem;  }
+		.music_ar{ font-size: 0.3rem; }
+		.music_singer{ font-size: 0.36rem; line-height: 0.5rem; padding-left: 0.5rem; }
+		.music_Lyric{ border-bottom: 1px solid yellowgreen; padding: 0.2rem 0; text-align: center; }
+		.music_songName{ font-size: 0.32rem; margin-bottom: 0.2rem; }
+		.music_songTxt{ font-size: 0.28rem; line-height: 1.5; padding: 0 0.3rem; }
+		/*进度*/
+		.music_progressbar{  }.music_option{  }
+		.music_time{ font-size: 0.24rem; color: dodgerblue;padding-left: 0.4rem;line-height: 1.5; }
+		.music_bar{ display: block;background: gainsboro; height: 0.3rem; border-radius: 0.4rem; overflow: hidden; margin: 0 0.1rem; }
+		.music_slider,.music_buffered{ display: block; position: absolute; height: 100%;border-radius: inherit; top: 0;left: 0;border: none;width: 0%; }
+		.music_buffered{ background-color: darkgray; width: 70%; }
+		.music_slider{ background-color: orangered; width: 50%; }
+		/*按键控制*/
+		.music_ctrl{  margin-top: 0.2rem; text-align: center; }
+		.music_btn{ display: inline-block; vertical-align: middle; width: 0.9rem; height: 0.9rem; border: 1px solid dodgerblue; border-radius: 50%;}
+		
+		.music_play,.music_stop{ margin: 0 0.5rem; width: 1.2rem;height: 1.2rem; position: relative;}
+		.music_play em{ display: none; }
+		.music_play i{position: absolute; width: 0.14rem; height: 0.5rem; background-color: dodgerblue; top: 0.34rem; }
+		.music_play i:nth-of-type(1){ left: 0.36rem; }
+		.music_play i:nth-of-type(2){ left: 0.66rem; }
+		
+		.music_stop i{ display: none; }
+		.music_stop em{position: absolute; width: 0; height: 0; top: 0.3rem; left: 0.34rem;
+				border-left: 0.6rem solid dodgerblue; border-bottom: 0.3rem solid transparent;border-top: 0.3rem solid transparent; }
+		.music_stop:active,.music_prev:active,.music_next:active{ background: dodgerblue; }
+		.music_stop:active em{ border-left: 0.6rem solid white; }
+		
+		.music_prev{  }
+		.music_prev em{ position: absolute; background: dodgerblue; width: 0.1rem; height: 0.42rem; top: 0.22rem; left: 0.18rem;}
+		.music_prev em:after{content: ''; position: absolute; width: 0; height: 0; top: 0.04rem; left: 0.1rem;
+				border-right: 0.4rem solid dodgerblue; border-bottom: 0.2rem solid transparent;border-top: 0.2rem solid transparent; }
+		.music_prev:active em{background: #FFF;}
+		.music_prev:active em:after{border-right: 0.4rem solid #FFF;}
+		
+		.music_next{  }
+		.music_next em{position: absolute; width: 0; height: 0; top: 0.22rem; left: 0.18rem;
+				border-left: 0.4rem solid dodgerblue; border-bottom: 0.2rem solid transparent;border-top: 0.2rem solid transparent; }
+		.music_next em:after{content: ''; position: absolute; background: dodgerblue; width: 0.1rem; height: 0.42rem; top: -0.21rem; right: -0.1rem;}
+		.music_next:active em{border-left: 0.4rem solid #FFF;}
+		.music_next:active em:after{background: #FFF;}
+	</style>
+	<script src="libs/simplekit.js"></script>
+	<!--<script src="libs/toolkit.js"></script>-->
+</head>
+
+<body>
+	<div class="audioPlayer">
+		<div class="music_info">
+			<div class="music_head">
+				<img class="music_avatar" src="img/rotary_01.png"/>
+			</div>
+			<div class="music_txt">
+				<p class="music_ar">Artist:</p>
+				<p class="music_singer">歌手</p>
+			</div>
+		</div>
+		<div class="music_Lyric">
+			<p class="music_songName">歌名</p>
+			<p class="music_songTxt">歌词</p>
+		</div>
+		<div class="music_progressbar">
+			<div class="music_option">
+				<p class="music_time">00:00</p>
+				<p class="music_vioce"></p>
+			</div>
+			<div class="music_bar">
+				<hr class="music_buffered" />
+				<hr class="music_slider" />
+			</div>
+		</div>
+		<div class="music_ctrl">
+			<div class="music_btn music_prev">
+				<em></em>
+			</div>
+			<div class="music_btn music_stop">
+				<i></i><i></i>
+				<em></em>
+			</div>
+			<div class="music_btn music_next">
+				<em></em>
+			</div>
+		</div>
+	</div>
+	<audio controls>
+		<source src="media/你的英文我永远不懂.mp3" type="audio/mp3">
+		Your browser does not support the audio tag.
+	</audio>
+	<video id="video1" controls>
+		<!--<source src="media/mov_bbb.mp4" type="video/mp4">-->
+		<source src="http://www.w3school.com.cn/example/html5/mov_bbb.ogg" type="video/ogg">
+		Your browser does not support HTML5 video.
+	</video>
+</body>
+<script>
+define('js/plugins/mediaCtrl', function(exports)
+{
+	function MediaCtrl(md)
+	{
+//		HTMLAudioElement,HTMLVideoElement
+		if(typeof(md)=="string"){
+			this.medias = document.querySelector(md);
+		} else this.medias = md;
+	}
+	var pro = MediaCtrl.prototype;
+	getSet('getMedia', { get:function(){ return this.medias; } });
+	pro.load = function(src, auto) {
+		this.medias.src = src;
+		this.autoplay = auto;
+		this.medias.load();
+		return this;
+	};
+	pro.play = function() { this.medias.play(); return this; };
+	pro.pause = function() { this.medias.pause(); return this; };
+	pro.stop = function() {
+		this.pause();
+		this.currentTime = 0;
+		return this;
+	};
+	getSet('autoplay', {
+		get:function(){ return this.medias.autoplay; },
+		set:function(auto){ this.medias.autoplay = auto===true ? true : false; }
+	});
+	getSet('buffered', { get:function(){
+		var timeRanges = this.medias.buffered;
+		return timeRanges.length > 0 ? timeRanges.end(0) : 0;
+	} });
+	pro.controls = function(show) { this.medias.controls = show === true ? true : false; return this; };
+	getSet('currentSrc', { get:function(){ return this.medias.currentSrc; } });
+	getSet('currentTime', {
+		get:function(){ return this.medias.currentTime; },
+		set:function(num){ this.medias.currentTime = num; }
+	});
+	pro.duration = function() {//返回当前音频/视频的长度（以秒计）
+		var time = this.medias.duration;
+		return isNaN(time) ? 0 : time;
+	};
+	getSet('ended', { get:function(){ return this.medias.ended; } });
+	pro.loop = function(auto){ this.medias.loop = auto === true ? true : false; return this; };
+	getSet('network', { get:function(){ return this.medias.networkState; } });
+	getSet('paused', { get:function(){ return this.medias.paused; } });
+	getSet('ready', { get:function(){ return this.medias.readyState > 3 ? true : false; } });
+	getSet('volume', {
+		get:function(){ return this.medias.volume; },
+		set:function(num){ this.medias.volume = num; }
+	});
+	getSet('duration', { get:function(){ var time = this.medias.duration; return isNaN(time) ? 0 : time; } });
+	getSet('percent', { get:function(){
+		var dur = this.duration, buffer = this.buffered, per;
+		if(dur == 0) return '0%';
+		per = buffer/dur * 100;
+		return parseInt(per)+'%';
+	} });
+	pro.events = {
+		loadstart:'loadstart', durationchange:'durationchange', loadedmetadata:'loadedmetadata',
+		loadeddata:'loadeddata',progress:'progress',canplay:'canplay',canplaythrough:'canplaythrough',
+		'error': 'error',emptied:'emptied',ended:'ended',pause:'pause',play:'play'
+	};
+	
+	var regON = /^on/;
+	pro.on = function(type, fn){
+		if(!regON.test(type)) type = 'on' + type;
+		if(fn instanceof Function) this.medias[type] = fn;
+		return this;
+	};
+	
+	pro.off = function(type){
+		if(!regON.test(type)) type = 'on' + type;
+		this.medias[type] = null;
+		return this;
+	};
+	pro.progress = function(fn){ return this.on(this.events.progress, fn); };
+	pro.canplay = function(fn){ return this.on(this.events.canplay, fn); };
+	pro.error = function(fn){ return this.on(this.events.error, fn); };
+	pro.ended = function(fn){ return this.on(this.events.ended, fn); };
+	pro.pause = function(fn){ return this.on(this.events.pause, fn); };
+	pro.play = function(fn){ return this.on(this.events.play, fn); };
+	
+	function getSet(name, method)
+	{
+		method.enumerable = true;
+		Object.defineProperty(pro, name, method);
+	}
+	pro = null;
+	return MediaCtrl;
+});
+define('js/plugins/audioCtrl', function(exports)
+{
+	var kit = require('main/kit'),
+		MediaCtrl = require('js/plugins/mediaCtrl');
+	
+	function AudioCtrl(md)
+	{
+		MediaCtrl.call(this, md);
+		if(!this.medias instanceof HTMLAudioElement){
+			this.medias = document.createElement( 'audio' );
+		}
+	}
+	kit.extendFn(AudioCtrl, MediaCtrl);
+	var pro = AudioCtrl.prototype;
+	pro.types = {
+	        'mp3': 'audio/mpeg',
+	        'ogg': 'audio/ogg',
+	        'wav': 'audio/wav',
+	        'aac': 'audio/aac',
+	        'm4a': 'audio/x-m4a'
+	   };
+	return AudioCtrl;
+});
+define('js/plugins/videoCtrl', function(exports)
+{
+	var kit = require('main/kit'),
+		MediaCtrl = require('js/plugins/mediaCtrl');
+	
+	function VideoCtrl(md)
+	{
+		MediaCtrl.call(this, md);
+		if(this.medias instanceof HTMLVideoElement){
+			
+		}
+	}
+	kit.extendFn(VideoCtrl, MediaCtrl);
+	return VideoCtrl;
+});
+define('init', function(exports)
+{
+	var AudioCtrl = require('js/plugins/audioCtrl'),
+		VideoCtrl = require('js/plugins/audioCtrl'),
+		audios = new AudioCtrl('audio'),
+		video = new VideoCtrl('video');
+	
+	exports.init = function() {
+		audios.autoplay = false;
+		audios.controls(true);
+	}
+	
+	document.addEventListener('click',function(e)
+	{
+//		video.currentTime = 5;
+		console.log(video.percent);
+	}, true);
+	
+	audios.canplay(function(e){
+		console.log('canplay');
+	});
+	
+	
+	
+	
+	
+	
+	return exports;
+});
+//	config({code:'code.js'});
+	initModule('init');
+	
+</script>
+</html>

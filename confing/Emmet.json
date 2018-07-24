@@ -1,0 +1,284 @@
+
+1. 嵌套操作----------
+
+子操作： >
+
+div>ul>li
+
+<div>
+    <ul>
+        <li></li>
+    </ul>
+</div>
+
+并列：+
+
+div+ul>li
+
+<div></div>
+<ul>
+    <li></li>
+</ul>
+
+上级：^
+
+ul>li^div
+
+<ul>
+    <li></li>
+</ul>
+<div></div>
+
+ul>li>a^^div 上级多层
+
+<ul>
+    <li><a href=""></a></li>
+</ul>
+<div></div>
+
+重复：*
+
+ul>li*3
+
+<ul>
+    <li></li>
+    <li></li>
+    <li></li>
+</ul>
+
+分组：()
+
+div>(p>span)*2
+
+<div>
+    <p><span></span></p>
+    <p><span></span></p>
+</div>
+
+2. 属性操作----------
+
+id和类
+
+div#header+div.main+div#footer
+
+<div id="header"></div>
+<div class="main"></div>
+<div id="footer"></div>
+
+属性值
+
+a[title=test target=_self]
+
+<a title="test" target="_self" href=""></a>
+
+数列值：$
+
+p.item$*3
+
+<p class="item1"></p>
+<p class="item2"></p>
+<p class="item3"></p>
+
+p.item$$*3
+
+<p class="item01"></p>
+<p class="item02"></p>
+<p class="item03"></p>
+
+数列操作符：@
+
+p.item$@-*3   @- = -1
+
+<p class="item3"></p>
+<p class="item2"></p>
+<p class="item1"></p>
+
+p.item$@3*3  @3 = 从3开始3次
+
+<p class="item3"></p>
+<p class="item4"></p>
+<p class="item5"></p>
+
+p.item$@-3*3 @-3 = 3次后到3结束
+
+<p class="item5"></p>
+<p class="item4"></p>
+<p class="item3"></p>
+
+3. 字符操作----------
+
+字符操作：{}
+
+a{click}
+
+<a href="">click</a>
+
+a>{click}+span{me}
+
+<a href="">click<span>me</span></a>
+
+4. 缺省元素----------
+
+.header+.footer  ---------------  div.header+div.footer
+
+ul>.item*3 -------------- ul>li.item*3
+
+table>.row*4>.cell*3 -------------- table>tr.row*4>td.cell*3
+
+
+最后注意：如果搞不清楚顺序了，多用()。就像1+2×3，实际上是(1+2)×3
+*/
+/*
+fl → float: left;
+
+
+而在编写这些CSS样式时，有很多是我们想好的写法，但生成的不是你想要的，比如position: absolute;，我们会输入pa，生成的就不是position: absolute;，这时我们可以：
+
+
+poa → position: absolute;
+
+
+一些用-连接的CSS样式和属性值，都可以取首字母：
+
+
+whscbs → whitewhite-space-collapse:break-strict;
+
+
+输出默认的CSS样式+，用+操作符，比如：
+
+
+bg+ → background: #fff url() 0 0 no-repeat;
+
+
+参数别名，Emmet为几个常用的单位值提供了别名：
+
+
+p → %
+e → em
+x → ex
+
+
+你可以使用别名代替完整的单位：
+
+
+w100p → width: 100%
+m10p30e5x → margin: 10% 30em 5ex
+
+
+颜色值，Emmet支持十六进制的颜色值：
+
+
+c#3 → color: #333;
+
+
+#是一个值分离器，所以不需要使用连字符分隔它，例如：
+
+
+bd5#0s → border: 5px #000 solid:
+
+
+你可以写一个,两个,三个或六个字符颜色值，Emmet都会正确解析为十六进制的颜色值：
+
+
+#1 → #111111
+#e0 → #e0e0e0
+#fc0 → #ffcc00
+
+
+属性值没有单位的CSS缩写：
+
+
+lh2 → line-height: 2;, fw400 → font-weight: 400;
+
+
+这些CSS属性有：
+
+
+z-index, line-height, opacity and font-weight
+
+
+!important 修饰符的写法：
+在我们编写好了CSS样式，需要添加!important时，只需要在后面输入!(!前需要有空格，因为这是在CSS样式基础上)，再按Tab键即可：
+
+
+float: left !; → float: left !important;
+
+
+在编写Emmet代码时需要添加!important，我们可以这样写：
+
+
+fl! → float: left !important;
+p6! → padding: 6px !important;
+
+
+对于有多个属性值的CSS属性，在编写时只需在属性值之间添加-：
+
+
+m4-6 → margin: 4px 6px;
+p4-6-8 → padding: 4px 6px 8px;
+
+
+@font-face是CSS3中的一个模块，他主要是把自己定义的Web字体嵌入到你的网页中，而@font-face的结构是比较复杂，有background-image、 border-radius、 font、@font-face、 text-outline、 text-shadow 等属性，用Emmet编写可以让它变得相当的简单，快速，只需输入@f+即可生成：
+
+
+@font-face {
+    font-family: 'FontName';
+    src: url('FileName.eot');
+    src: url('FileName.eot?#iefix') format('embedded-opentype'),
+         url('FileName.woff') format('woff'),
+         url('FileName.ttf') format('truetype'),
+         url('FileName.svg#FontName') format('svg');
+    font-style: normal;
+    font-weight: normal;
+}
+
+
+前缀：
+CSS3一些新的特性对于我们前端开发人员是一个重要的更新，用几行代码就可以实现强大的功能，这是之前的CSS样式不可能实现的。但这也是一种痛苦，对于不同的浏览器我们需要多次写相同的样式。[/slidenormal]
+Emmet的CSS解析器有一个很好的功能，可以大大改善为了解决浏览器兼容性而多次写的属性。例如圆角属性，-bdrs4就可生成：
+
+
+-webkit-border-radius: 4px;
+-moz-border-radius: 4px;
+border-radius: 4px;
+
+
+对于一些前缀，Sublime Text中也内置了一些属性的前缀，比如输入trf即可得到：
+
+
+-webkit-transform: |;
+-moz-transform: |;
+-ms-transform: |;
+-o-transform: |;
+transform: |;
+
+
+在Emmet中，在任意两个字符前面添加-操作符，都可以生成带前缀的属性值，比如-float-d：
+
+
+-webkit-float-d: |;
+-moz-float-d: |;
+-ms-float-d: |;
+-o-float-d: |;
+float-d: |;
+
+
+CSS3一个新的、也相当重要的特性是渐变，渐变的属性值又比较复杂，如果再兼容所有的浏览器，代码量是相当大的。而Emmet有一个CSS3渐变的解析器，可以帮我们把这项复杂的工作快速的完成：
+
+
+lg(left #f90 20% red)
+
+
+将生成：
+
+
+background-image: -webkit-gradient(linear, 0 0, 100% 0, );
+background-image: -webkit-linear-gradient(left #f90 20% red);
+background-image: -moz-linear-gradient(left #f90 20% red);
+background-image: -o-linear-gradient(left #f90 20% red);
+background-image: linear-gradient(left #f90 20% red);
+
+
+在lg()括号中需要有值，不然Emmet会解析成left: ;。
+Emmet编写CSS样式还有很多需要注意的地方，而写出来比较困难，到官方网站看看CSS样式的缩写，会更明白。
+Emmet还有很多强大的功能，下次再整理Emmet的高级功能与大家分享。

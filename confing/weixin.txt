@@ -1,0 +1,34 @@
+视图容器：
+wx-view，wx-scroll-view，wx-swiper，wx-swiper-item
+基础内容：
+wx-icon，wx-text，wx-progress，wx-mask
+
+表单组件：
+wx-input，wx-button，wx-label，wx-form，wx-checkbox，wx-checkbox-group，wx-picker，wx-picker-item，wx-radio，wx-radio-group，wx-switch，wx-slider，wx-slector-item
+操作反馈：
+wx-action-sheet，wx-action-sheet-cancel，wx-action-sheet-item，wx-loading，wx-toast，wx-modal
+
+导航：
+wx-navigator
+
+媒体组件：
+wx-image，wx-audio，wx-video，
+
+地图：
+wx-map
+
+画布：
+wx-canvas，
+
+其他：
+wx-native
+
+
+在WAWebview.js中定义了默认的标签
+window.exparser.registerElement({
+is: "wx-view",
+template: "",
+behaviors: ["wx-base"],
+properties: {}
+}）
+安装目录\package.nw\app\dist\weapp\onlinevendor\WAWebview.js

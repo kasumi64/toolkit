@@ -1,0 +1,167 @@
+beforecopy：在发生复制操作前触发;
+copy：在发生复制操作的时候触发;
+beforecut：在发生剪切操作前触发;
+cut：在发生剪切操作的时候触发;
+beforepaste：在发生粘贴操作前触发;
+paste：在发生粘贴操作的时候触发。
+
+
+img.ondragstart = function(e){ event.dataTransfer.setData('text', event.target.id)//拖拽数据传递对象}
+div.ondrop = function(e){
+        var id = event.dataTransfer.getData('text');
+        console.log(id);
+        var img = document.getElementById(id);
+        div.appendChild(img);
+    }
+dragstart：开始拖动
+drag：拖动中，与mousemove和touchmove事件类似
+dragend：拖动完成
+当某个元素被拖动到一个有效的放置目标的时候，会触发：
+dragenter：拖放进入，也就是鼠标拖放对象进入拖放区域。(拖动到放置目标上)
+dragover：拖放对象悬浮于拖放区域，在拖放区域内移动时多次触发。
+div.ondragover = function(e){e.preventDefault()};//默认是不拖到元素内部的
+dragleave：离开拖放区域。
+dragdrop：拖放完成，也就是鼠标拖入对象并在拖放区域释放。
+
+
+
+
+storage		//事件
+	sessionStorage和localStorage
+devicePixelRatio	//设备像素比
+orientationEvent	//屏幕翻转事件  
+
+//onbeforeunload	是在页面刷新或关闭前触发
+window.onbeforeunload = function(){
+	console.log("leave this page!");
+}
+//onunload		IE专用
+
+
+
+
+//屏蔽鼠标右键、Ctrl+N、Shift+F10、F11、F5刷新、退格键     
+
+document.oncontextmenu = function(e){
+	e.preventDefault();
+	event.returnValue=false;
+}//屏蔽鼠标右键   
+
+window.onhelp = function(){return false}       //屏蔽F1帮助   
+
+document.onkeydown = function(){   
+
+    if((window.event.altKey)&&   
+
+      ((window.event.keyCode==37)||            //屏蔽Alt+方向键←   
+
+      (window.event.keyCode==39))){            //屏蔽Alt+方向键→
+
+           alert("不准你使用ALT+方向键前进或后退网页！");   
+
+           event.returnValue=false;    
+
+      }         if((event.keyCode==8)||                    //屏蔽退格删除键    
+
+      (event.keyCode==116)||                   //屏蔽F5刷新键   
+
+      (event.ctrlKey && event.keyCode==82)){   //Ctrl+R   
+
+           event.keyCode=0;   
+
+           event.returnValue=false;   
+
+      }   
+
+      if(event.keyCode==122){event.keyCode=0;event.returnValue=false;}    //屏蔽F11   
+
+      if(event.ctrlKey && event.keyCode==78)event.returnValue=false;      //屏蔽Ctrl+n   
+
+      if(event.shiftKey && event.keyCode==121)event.returnValue=false;    //屏蔽shift+F10   
+
+      if(window.event.srcElement.tagName=="A" && window.event.shiftKey)     
+
+         window.event.returnValue=false;       //屏蔽shift加鼠标左键新开一网页   
+
+      if((window.event.altKey)&&(window.event.keyCode==115)){             //屏蔽Alt+F4    
+
+         window.showModelessDialog("about:blank","","dialogWidth:1px;dialogheight:1px");   
+
+         return false;   
+
+      }   
+
+  }   
+
+
+
+var EventTarget = function() {
+  this.listeners = {};
+};
+
+EventTarget.prototype.listeners = null;
+EventTarget.prototype.addEventListener = function(type, callback) {
+  if(!(type in this.listeners)) {
+    this.listeners[type] = [];
+  }
+  this.listeners[type].push(callback);
+};
+
+EventTarget.prototype.removeEventListener = function(type, callback) {
+  if(!(type in this.listeners)) {
+    return;
+  }
+  var stack = this.listeners[type];
+  for(var i = 0, l = stack.length; i < l; i++) {
+    if(stack[i] === callback){
+      stack.splice(i, 1);
+      return this.removeEventListener(type, callback);
+    }
+  }
+};
+
+EventTarget.prototype.dispatchEvent = function(event) {
+  if(!(event.type in this.listeners)) {
+    return;
+  }
+  var stack = this.listeners[event.type];
+  event.target = this;
+  for(var i = 0, l = stack.length; i < l; i++) {
+      stack[i].call(this, event);
+  }
+};
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+//popstate事件在浏览器历史操作时触发, 比如点击后退按钮(或者在JavaScript中调用history.back()方法).
+ window.onpopstate = function() {
+      checkLocation();
+ };
+ 1. HTML4时代的history API
+
+A) history.length：当前历史列表中的历史记录数（我大概测了下，IE6+是从0开始的，其他的是从1开始的，若有误请反馈哈，^_^）； 
+B) history.go(n)：前进或后退n条记录，当n=0或空时会刷新当前页； 
+C) history.back()：后退一步； 
+D) history.forward()：前进一步;
+ 
+
+2. HTML5新增的API
+A) history.pushState(data, title [, url])：往历史记录堆栈顶部添加一条记录；data会在onpopstate事件触发时作为参数传递过去；title为页面标题，当前所有浏览器都会 忽略此参数；url为页面地址，可选，缺省为当前页地址； 
+B) history.replaceState(data, title [, url]) ：更改当前的历史记录，参数同上； 
+C) history.state：用于存储以上方法的data数据，不同浏览器的读写权限不一样； 
+D) window.onpopstate：响应pushState或replaceState的调用；
+
+有 了这几个新的API，针对支持的浏览器，我们可以构建用户体验更好的应用了。
+就像刚提到的Facebook相册，虽然是AJAX的方式，但用户可以直接复 制页面地址分享给好友，
+好友打开看到的就是AJAX加载的数据，做到了书签化。当然这里面需要做的工作远不是说的这么简单。

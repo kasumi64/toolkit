@@ -1,0 +1,305 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="UTF-8">
+	<meta http-equiv="content-type" content="text/html; charset=UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0, user-scalable=no"/>
+	<meta content="yes" name="apple-mobile-web-app-capable" />
+	<meta name="format-detection" content="telephone=no">
+	<meta http-equiv="Cache-Control" content="no-store" />
+	<meta http-equiv="Pragma" content="no-cache" />
+	<meta http-equiv="Expires" content="0" />
+	<title>方块</title>
+	<link rel="stylesheet" type="text/css" href="css/initTag.css"/>
+	<script id="IDkit" type="text/javascript" src="libs/simplekit.js"></script>
+</head>
+<style type="text/css">
+	body{font-size: 0;line-height: 1;}
+	#screen{ white-space: nowrap; max-width: 7.5rem; margin: 0 auto; }
+	#stage{
+		border: 1px solid #000; background-color: #FFF; width: 4.88rem; display: inline-block;
+		vertical-align: top; white-space: normal;margin-left: 0.26rem;
+	}
+	#stage li, #pro li{
+		background-color: #FFF; width: 0.4rem; height: 0.4rem; display: inline-block;
+	}
+	.system{
+		position: absolute;top: 0; right: 0;height: 100%; width: 2.3rem;
+		display: inline-block; text-align: center; padding-top: 1.6rem;
+	}
+	.system button{ font-size: 0.3rem; margin: 0 0.16rem;}
+	#pro{
+		position: absolute;bottom: 0; right: 0; display: block; border: 1px solid red;
+		margin-top: 0.5rem; white-space: normal; font-size: 0; overflow: hidden;
+	}
+	#abc{opacity: 0;}
+</style>
+<body>
+	<div id="screen">
+		<ul id="stage"></ul>
+		<div class="system">
+			<button id="reset">重置</button>
+			<button id="start">暂停</button>
+			<ul id="pro"></ul>
+		</div>
+	</div>
+	<!--<input id="abc" type="text" />-->
+</body>
+</html>
+<script type="text/javascript">
+initModule(function()
+{
+	var kit = require('main/kit');
+	
+	var stageArr, proArr, maps;
+	var max = {}, startBtn = kit('#start'),
+		abc = kit('#abc');
+	
+	!function()
+	{
+		stageArr = initLi(15, 12, '#stage');
+		max.x = stageArr[0].length;
+		max.y = stageArr.length;
+		proArr = initLi(6, 5, '#pro');
+		small = new Shape('#pro li');
+		small.getShape();
+		maps = new ShapeType1(small);
+		addEvent();
+	}();
+	
+	function initLi(len1, len2, parent)
+	{
+		var frag = document.createDocumentFragment(),
+			arr = [], li, obj;
+		for (var i = 0; i < len1; i++) {
+			arr.push([]);
+			for (var k = 0; k < len2; k++) {
+				obj = {};
+				obj.li = document.createElement('li');
+				obj.use = 0, obj.x = k, obj.y = i;
+				arr[i].push(obj);
+				frag.appendChild(obj.li);
+			}
+		}
+		kit(parent)[0].appendChild(frag);
+		return arr;
+	}
+	
+	function Motion(id, smallMap)
+	{
+		var interval = 1000, timer = 0,
+			list = kit(id), _start, _ctrlBtn, _move;
+		
+		function enable(boolean)
+		{
+			if(boolean){
+				document.addEventListener('keydown', _move);
+				document.addEventListener('keyup', _ctrlBtn);
+			} else {
+				document.removeEventListener('keydown', _move);
+				document.removeEventListener('keyup', _ctrlBtn);
+			}
+		}
+		
+		this.move = function(fn)
+		{
+			_move = fn;
+		};
+		this.ctrlBtn = function(fn)
+		{
+			_ctrlBtn = fn;
+		};
+		this.onStart = function(fn) { _start = fn; };
+		this.stop = function()
+		{
+			enable(false);
+			clearInterval(timer);
+		};
+		this.start = function()
+		{
+			clearInterval(timer);
+//			timer = setInterval(_start, interval);
+			enable(true);
+		};
+		this.reset = function()
+		{
+			clearInterval(timer);
+			list.css('background','#FFF');
+			smallMap.reset();
+			enable(false);
+		};
+	}
+	
+	
+	function ShapeType1(smallMap)
+	{
+		var _super = new Motion('#stage li', smallMap);
+		kit.extend(this, _super);
+		var cen = Math.floor(max.x / 2), rotate = 1, _this = this,
+			shape = [], obj;
+		
+		!function init()
+		{
+			rotate = 1;
+			for (var i = 0; i < 4; i++) {
+				obj = shape[i] = stageArr[0][cen-2+i];
+				obj.li.style.background = '#F00';
+				if(obj.use == 1){
+					_this.stop();
+					alert('gameOver');
+				}
+			}
+		}()
+		function start()
+		{
+			log('start1')
+		}
+		function action(e)
+		{
+			kit.defaultEvent(e);
+			var key = e.which || e.keyCode;
+			rotate == 1 ? type1(key) : type2(key);
+		}
+		function type1(dir)
+		{
+			if(dir == 37){//左
+				
+			}else if(dir == 39){//右
+				
+			}else if(dir == 40){//下
+				
+			}
+			
+		}
+		function type2(dir)
+		{
+			
+		}
+		function turn()
+		{
+			obj = shape[0];
+			var i, cu = {x:obj.x, y:obj.y};
+			if(rotate == 1){//横
+				if(cu.y + 3 >= stageArr.length) return;
+				for (i = 0; i < 4; i++) {
+					obj =  stageArr[cu.y+i][cu.x+2];
+					if(obj.use == 1) return;
+				}
+				clear();
+				for (i = 0; i < 4; i++) {
+					obj =  stageArr[cu.y+i][cu.x+2];
+					obj.li.style.background = '#F00';
+					shape[i] = obj;
+				}
+			} else {//竖
+				var len = --stageArr[0].length;
+				cu.x = cu.x - 2 < 0 ? 0 : (cu.x + 3 > len ? len : cu.x);
+				for (i = 0; i < 4; i++) {
+					obj =  stageArr[cu.y][cu.x-2+i];
+					if(!obj || obj.use == 1) return;
+				}
+				clear();
+				for (i = 0; i < 4; i++) {
+					obj =  stageArr[cu.y][cu.x-2+i];
+					obj.li.style.background = '#F00';
+					shape[i] = obj;
+				}
+			}
+			if(++rotate > 2) rotate = 1;
+		}
+		function clear()
+		{
+			for (var i = 0; i < 4; i++) {
+				obj = shape[i];
+				obj.li.style.background = '#FFF';
+			}
+		}
+		function ctrlBtn(e)
+		{
+			kit.defaultEvent(e);
+			var key = e.which || e.keyCode;
+			if(key == 32){//空格
+				turn();
+				log('trun')
+			}else if(key == 13){//enter
+				var str = startBtn.text();
+				if(str == '开始'){
+					startBtn.text('暂停');
+					_this.stop();
+				} else {
+					startBtn.text('开始');
+					_this.start();
+				}
+			}else if(key == 27){//esc
+				_this.reset();
+			}
+		}
+		this.move(action);
+		this.ctrlBtn(ctrlBtn);
+		this.onStart(start);
+		this.reset = function()
+		{
+			_super.reset();
+			rotate = 1;
+		};
+	}
+	
+	
+	
+	function Shape(id)
+	{
+		var _shape, list = kit(id);
+		this.getShape = function()
+		{
+			list.css('background','#FFF');
+			_shape = kit.randomNum(1,5);
+			_rotate = 1;
+			var obj;
+			for (var i = 1; i < 5; i++) {
+				switch (_shape){
+					case 5:
+						if(i<2) obj = proArr[2][i+1].li;
+						else obj = proArr[3][i-1].li;
+						break;
+					case 4:
+						if(i<4) obj = proArr[2][i].li;
+						else obj = proArr[3][i-1].li;
+						break;
+					case 3:
+						if(i<4) obj = proArr[2][i].li;
+						else obj = proArr[3][i-3].li;
+						break;
+					case 2:
+						if(i<3) obj = proArr[2][1+i].li;
+						else obj = proArr[3][i-1].li;
+						break;
+					default:
+						obj = proArr[i][2].li; break;
+				}
+				obj.style.background = '#F00';
+			}
+			return _shape;
+		};
+		this.reset = function(){ list.css('background','#FFF'); };
+	}
+	function addEvent()
+	{
+		kit('#reset').click(function(){
+			maps.reset();
+		});
+		
+		startBtn.click(function(e){
+			var str = startBtn.text();
+			log(e.type)
+			if(str == '开始'){
+				startBtn.text('暂停');
+				maps.stop();
+			} else {
+				startBtn.text('开始');
+				maps.start();
+			}
+//			abc[0].focus();
+		});
+	}
+});
+</script>

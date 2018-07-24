@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+    <title>密码框</title>
+    <link rel="stylesheet" type="text/css" href="../css/initTag.min.css"/>
+<style type="text/css">
+.verifyBox{
+	font-size: 0;
+	margin: 0.3rem;
+	border: 1px solid #9fb4eb;
+	border-radius: 5px;
+	overflow: hidden;
+	height: 1.08rem;
+	white-space: nowrap;
+	background: #FFF;
+}
+.verifyBox .input{
+	vertical-align: top;
+	display: inline-block;
+	text-align: center;
+	width: 16.6%;
+	height: 100%;
+	line-height: 1.08rem;
+	border: none;
+	font-size: 0.48rem;
+	color: #8c8c8c;
+}
+.verifyBox .input:not(:first-child){
+	border-left: 1px solid #e0e0e0;
+}
+.verify{
+	display: block;
+	position: absolute;
+	top: 0;
+	left: -100%;
+	width: 100%;
+	height: 100%;
+	font-size: 0.48rem;
+	color: red;
+	background: transparent;
+	border: none;
+	opacity: 0;
+}
+</style>
+    <script src="../simplekit.js"></script>
+</head>
+<body>
+	<div class="verifyBox">
+		<input id="verify" class="verify" type="tel" maxlength="6"/>
+		<div class="input" contenteditable="false"></div>
+		<div class="input" contenteditable="false"></div>
+		<div class="input" contenteditable="false"></div>
+		<div class="input" contenteditable="false"></div>
+		<div class="input" contenteditable="false"></div>
+		<div class="input" contenteditable="false"></div>
+	</div>
+</body>
+<script type="text/javascript">
+	
+	initModule(function(require)
+	{
+		var kit = require('main/kit');
+		var divInput = kit(".verifyBox .input");
+		var verify = kit("#verify").input(function(e){
+			var txt = this.value, max = this.maxLength;
+			if(max < 1) max = 6;
+			divInput.each(function(el, i){
+				var str = txt[i];
+				if(str){
+					el.innerText = str;
+				} else {
+					el.innerText = '●';
+				}
+				if(i==5 && txt.length == max){
+					//TODO
+				} else if(txt == '') divInput.text('');
+			});
+		});
+		kit('.verifyBox').up(function(e){
+			verify[0].focus();
+		});
+	});
+</script>
+</html>

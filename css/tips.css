@@ -1,0 +1,80 @@
+@charset "utf-8";
+/****************** 按钮提示框 *********************/
+#tip{
+	display: block;
+	width: 100%;
+	height: 100%;
+	position: fixed;
+	left: 0;
+	top: 0;
+	background: rgba(0,0,0,0.5);
+}
+#tip img{
+	width: 16px;
+	display: block;
+	position: absolute;
+	top: -30px;
+	right: 0;
+}
+#tip .hint{
+	background: #FFF;
+	color: #333;
+	width: 275px;
+	margin: auto;
+	border-radius: 4px;
+	padding: 20px;
+	text-align: center;
+}
+#tip .ti{
+	display: none;
+	font-size: 16px;
+	padding-bottom: 12px;
+}
+#tip .txt{
+	line-height: 21px;
+	font-size: 13px;
+	margin-bottom: 44px;
+	overflow: auto;
+	max-height: 300px;
+	
+}
+#tip .tel{
+	color: #2287d6;
+}
+#tip .btnBox{
+	background: #FFF;
+	font-size: 16px;
+	color: #3CBAFF;
+	width: 100%;
+	position: absolute;
+	left: 0;
+	bottom: 0;
+	border-top: 1px solid #E0E0E0;
+	border-radius: 0 0 5px 5px;
+}
+#tip .btnBox a{
+	display: inline-block;
+	line-height: 43px;
+	text-align: center;
+	width: 50%;
+}
+#tip .btnBox a:first-child{
+	border-right: 1px solid #E0E0E0;
+}
+/****************** 弱提示 **********************/
+#weak{
+	width: 100%;
+	text-align: center;
+	position: fixed;
+	bottom: 50%;
+}
+#weak #content {
+	margin: 0 15px;
+	display: inline-block;
+	color: #FFF;
+	font-size: 15px;
+	background: rgba(0,0,0,0.5);
+	padding: 12px 24px;
+	border-radius: 3px;
+	line-height: 20px;
+}

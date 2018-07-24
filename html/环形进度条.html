@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="UTF-8">
+	<title>环形进度条</title>
+	<script src="js/jquery-2.2.0.js" type="text/javascript" charset="utf-8"></script>
+<style type="text/css">
+	.pie_right {
+	    width:200px; 
+	    height:200px;
+	    position: relative;
+	    top: 0;
+	    left: 0;
+	    background:#aaa;
+	    border-radius: 50%;
+	}
+	.right {
+	    width:200px; 
+	    height:200px;
+	    background:#de1212;
+	    border-radius: 50%;
+	    position: absolute;  
+	    top: 0;
+	    left: 0;
+	}
+	.pie_right{}
+	.right {
+	    clip:rect(0,auto,auto,100px);
+	}
+	.mask {
+	    width: 150px;
+	    height: 150px;
+	    border-radius: 50%;
+	    left: 25px;
+	    top: 25px;      
+	    background: #FFF;
+	    position: absolute;
+	    text-align: center;
+	    line-height: 150px;
+	    font-size: 20px;
+	    background: #FFF;
+	}
+	
+	
+.circularProgressBar {
+    width: 200px;
+    height: 200px;  
+    position: relative;
+    border-radius: 50%;
+    background: #ff5e00;
+}
+.circularProgressBar .pie_left,
+.circularProgressBar .pie_right {
+    width: 200px; 
+    height: 200px;
+    position: absolute;
+    top: 0;left: 0;
+}
+.circularProgressBar .left,
+.circularProgressBar .right {
+    display: block;
+    width:200px; 
+    height:200px;
+    background:#ccc;
+    border-radius: 50%;
+    position: absolute;
+    top: 0;
+    left: 0;
+    transform: rotate(0deg);
+}
+.circularProgressBar .pie_right,
+.circularProgressBar .right {
+    clip:rect(0,auto,auto,100px);
+}
+.circularProgressBar .pie_left,
+.circularProgressBar .left {
+    clip:rect(0,100px,auto,0);
+}
+.circularProgressBar .mask {
+    width: 150px;
+    height: 150px;
+    border-radius: 50%;
+    left: 25px;
+    top: 25px;
+    background: #FFF;
+    position: absolute;
+    text-align: center;
+    line-height: 150px;
+    font-size: 16px;
+}
+	
+</style>
+</head>
+<body>
+	<div class="pie_right">
+	    <div class="right"></div>
+	    <div class="mask"><span>50</span>%</div>
+	</div>
+	<div class="circularProgressBar">
+	    <div class="pie_left"><div class="left"></div></div>
+	    <div class="pie_right"><div class="right"></div></div>
+	    <div class="mask"><span>80</span>%</div>
+	</div>
+</body>
+</html>
+<script type="text/javascript">
+	$(function() {
+	    $('.circularProgressBar').each(function(index, el) {
+	        var num = $(this).find('span').text() * 3.6;
+	        if (num<=180) {
+	            $(this).find('.right').css('transform', "rotate(" + num + "deg)");
+	        } else {
+	            $(this).find('.right').css('transform', "rotate(180deg)");
+	            $(this).find('.left').css('transform', "rotate(" + (num - 180) + "deg)");
+	        };
+	    });
+	
+	});
+</script>
