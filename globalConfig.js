@@ -3,8 +3,6 @@
  * @date: 20170814--20180308;
  */
 define('main/globalVar', function(require, exports, module){
-	exports.debug = true;
-	exports.babel = true;
 	return exports;
 });
 (function(){

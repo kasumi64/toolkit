@@ -1,6 +1,6 @@
 /*
  * @author: leiguangyao;
- * @date: 20160523--20180713;
+ * @date: 20160523--20180807;
  */
 ;(function(doc){ //20180712
 	'use strict';
@@ -183,7 +183,7 @@
 	};
 	evtPro = null;
 }(window, document));
-(function(globals, doc) { //20180713 TODO
+(function(globals, doc) { //20180807 TODO
 	'use strict';
 	var initTime = Date.now(), mapping = {}, cache = {}, plugins = [],
 		regJS = /\.js$/, regCSS = /\.css$/, curReq = null, initFn = [];
@@ -242,7 +242,8 @@
 	function parseRely(urls, fn, id){
 		if(!config.complete) return configEvent(urls, fn, id);
 		urls = sta(urls);
-		fn = fn.toString().replace(/\/\/.+|\s|"|'/g,'').replace(/\/\*.+?\*\//g,'')
+//		fn = fn.toString().replace(/\/\/.+|\s|"|'/g,'').replace(/\/\*.+?\*\//g,'')
+		fn = fn.toString().replace(/(\/\*[\s\S]+?\*\/)|(\/\/.+)|['"`\s]/g, '')
 		.replace(/{(\w+)}/g, function(o, v){return config.vars[v]||o});
 		var reg = (fn.indexOf('function')==0) ? (/.+?\((.+?)[,)]/).exec(fn) : (/.+?(.+?)\){0,1}=>/).exec(fn);
 		if(!reg||reg[1].indexOf(')')==0) return urls;
@@ -265,9 +266,15 @@
 				var reg = new RegExp('^'+p);
 				for(a in alias) alias[a] = alias[a].replace(reg, path[p]);
 			}
-		}
+		} else config.paths = {};
 		config.complete = true;
 		forWait();
+	}, false, false);
+	Object.addProto(exp.initModule, 'addConfig', function (obj){
+		obj = typeof(obj)=="object" ? obj : {};
+		var kit = exp.kitRequire('main/kit');
+		obj = kit.extend(obj,config);
+		exp.initModule.config(obj);
 	}, false, false);
 	function configEvent(urls, fn, id){ wait[id] = {r:urls, fn:fn}; }
 	function forWait(){
