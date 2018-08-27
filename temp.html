@@ -55,6 +55,8 @@ initModule(['jquery3','http'], function(req, exports, module)
 	var kit = req('{kit}'), utils = req('{utils}');
 	var doc = document, win = window;
 //	kit.screenFix(50);
+
+
 	
 	win.addEventListener('keydown',function(e){
 		//13enter 32space
@@ -67,11 +69,12 @@ initModule(['jquery3','http'], function(req, exports, module)
 //		if(navigator.userAgent.indexOf("Chrome") > -1){}
 //		console.log(navigator.clipboard.writeText('AGC')); //document.execCommand
 //		async().then(V=>console.info(V));
-		
-//		console.log(String.prototype);
+
+
 		
 		
 		http().json('http://localhost:8040/php/Hphp/sv.php',{a:88},(j)=>{
+			
 			console.log([j]);
 			
 		});
@@ -83,6 +86,8 @@ initModule(['jquery3','http'], function(req, exports, module)
 	function del(e){
 //		var e = e||window.event;
 //		console.log(e===window.event);
+		
+		
 		
 		xhr.ajax({
 			url: 'http://localhost:8040/php/sv.php',

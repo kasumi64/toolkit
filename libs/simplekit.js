@@ -291,6 +291,7 @@
 		if( isReady() ) globals.setTimeout( execute );
 	}
 	function toVars(str){
+		if(typeof(str)!="string") return str;
 		return str.replace(/{(\w+)}/g, function(o, v){return config.vars[v]||o});
 	}
 	//预加载
@@ -579,16 +580,16 @@ define('main/kit', function (require, exports, module)
 			if(stopEvent == 1) win.event.cancelBubble = true;
 		}
 	};
-	var _regTemplate = /{(\w+)}/g;//匹配{***}
+	var _regTemplate = /{{(\w+)}}/g;//匹配{{***}}
 	var _regSpace = /^\s+|\s+$/g;//去空格
 	/**
 	 * dom的动态拼接与赋值
-	 * @param {Object} data 替换的数据,数组或{};
+	 * @param {Object} data 替换的数据,数组或{{}};
 	 * @param {String} dom <template>标签的dom结构
-	 * @param {Boolean} origin 是否保留dom结构的{rep}，默认false替换为''；
+	 * @param {Boolean} origin 是否保留dom结构的{{rep}}，默认false替换为''；
 	 * @param {Boolean} getArr 为true时可返回数组，默认false返回str。
-	 * @example <template id='tl'><p>{rep}</p></template>
-	 * template({rep:'我被替换了'},tl.innerHTML);
+	 * @example <template id='tl'><p>{{rep}}</p></template>
+	 * template({{rep:'我被替换了'}},tl.innerHTML);
 	 */
 	ToolKit.template = function(jsons, dom, origin, getArr){
 		if(!(jsons instanceof Array)) jsons = [jsons];
