@@ -22,12 +22,17 @@
 	.warp{ /*width: 1000%;*/ white-space: nowrap; height: 100%;}
 	.warp div{ font-size: 0.5rem; width: 100%; height: 100%; display: inline-block; border: 1px solid #0000FF;
 		color: crimson; text-align: center; line-height: 80px; }
+	.broadcast{height: 50px;text-align: center;background: #FFF;}
+	.broadcast .item{width: 100%; font-size: 16px;line-height: 50px;}
 </style>
 <body id="body">
 	<div class="ckbtn">
 		<button id="ck1">点击输出1</button>
 		<button id="ck2">点击输出2</button>
 	</div>
+	
+	<div class="broadcast"></div>
+	
 	<div id="pp">
 		<div class="warp">
 			<div>第一个</div><div>第二个</div><div>第三个</div>
@@ -49,12 +54,9 @@
 
 initModule(['scrollPage', 'scrollMobile'],function(require)
 {
-	var kit = require('main/kit');
-	kit.screenFix();
-	var win = window, doc = document;
+	var win = window, doc = document, kit = require('main/kit');
 	//translate拖动
-	var dragCtrl = require('dragCtrl'),
-		div = dragCtrl('.img');
+	var dragCtrl = require('dragCtrl'), div = dragCtrl('.img');
 	div.enabledRebound(false);
 	//translate滚动
 //	var dragPage = require('dragPage'),
@@ -69,6 +71,7 @@ initModule(['scrollPage', 'scrollMobile'],function(require)
 		auto = autoScroll('.warp', 2);
 	auto.setYaxis(false);
 	auto.hasNavDot();
+	auto.stop();
 //	auto.cyclic(true);
 //	auto.useIE();
 	//scroll拖动
@@ -87,15 +90,22 @@ initModule(['scrollPage', 'scrollMobile'],function(require)
 
 	
 	kit('#ck1').click(function(){
-		
+		var div=kit('div');
+		debugger
+		div.mouseout(function(e){
+			
+		});
 	});
 	kit('#ck2').click(function(){
 		
 	});
 	
 	
-	
-	
+	var bc = require('broadcast');
+	var jsons = [{txt:'ABC'},{txt:'123'},{txt:'qyt89885'},{txt:'_ABC_89'}];
+	bc = new bc(jsons, 1000, 3000);
+	bc.setItem('.broadcast', '<p class="item">${{txt}}$</p>');
+	bc.start('top');
 	
 	
 	
@@ -174,12 +184,5 @@ function calendar()
 	delete option.onSelect;
 	$("#dj2").datepicker(option);
 }
-/*	var js = 'js/plugins/';
-	kit.loadScript([
-		'js/jquery-2.2.0.js',
-		js+'simpleDragPage.js',
-		js+'scrollPage.js',
-		js+'getDate.js',
-		'js/jquery-ui/v1.11.4/jquery-ui.js'
-	]);*/
+
 </script>

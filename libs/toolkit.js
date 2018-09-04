@@ -970,13 +970,13 @@ define('main/kit', function(require, exports, module)
 			_addEvent.call(this,this,type,fn, bubble);
 			return this;
 		};
-		pro.off = function(type, fn, bubble) {
+		pro.off = function(type, fn, bubble, deep) {
 			_clearEvent.call(this,this,type,fn, bubble);
 			var i, el, on;
 			for (i = 0; i < this.length; i++) {
 				el = this[i];
 				if(type) el['on'+type] = null;
-				else {
+				else if(deep === true) {
 					for(on in el) if(_regon.test(on) && el[on]) el[on] = null;
 				}
 			}
@@ -1025,7 +1025,7 @@ define('main/kit', function(require, exports, module)
 			var val;
 			if(isAll === true){ //getPropertyValue
 				val = [];
-				_each.call(this, function(el){ val.push(_getStyle(e, styles, isNum, pseudo)); });
+				_each.call(this, function(el){ val.push(_getStyle(el, styles, isNum, pseudo)); });
 			} else val = _getStyle(this[0], styles, isNum, pseudo)
 			return val;
 		};
@@ -1338,9 +1338,9 @@ define('main/kit', function(require, exports, module)
 			return _each.call(this, function(el){ _div.appendChild(el); });
 		};
 		/*删除元素与事件*/
-		pro.remove = function() {
+		pro.remove = function(deep) {
 			this.detach();
-			this.off();
+			this.off(null, '', '', deep);
 			return this;
 		};
 		//在外部的elem里面
@@ -1658,8 +1658,9 @@ define('main/kit', function(require, exports, module)
 			this.timer.stop(done);
 			return this;
 		};
-		pro.dispose = function(evt){
-			if(evt !== false) this.off();
+		pro.dispose = function(deep){
+			if(deep===true) this.remove(deep);
+			else this.off(null, '', '', evt);
 			this.splice(0, this.length);
 		};
 		pro = null;
