@@ -1,6 +1,6 @@
 /*
  * @author: leiguangyao;
- * @date: 20160902--20180807;
+ * @date: 20160902--201800910;
  */
 ;(function(doc){ //20180712
 	'use strict';
@@ -32,57 +32,13 @@
 		this.addProto(target, keys, methods, enumerable, 'getset', configurable);
 		return target;
 	};
-	nativePro.inObject = function(target, obj, key){
-		if(!(obj&&obj.constructor.name=='Object') || target==void 0) return false;
-		var tar = target[key] || target, o, k;
-		if(key){
-			o = obj[key];
-			if(tar === o) return true;
-			for(k in obj){
-				o = obj[k];
-				if(o && o.constructor.name == 'Object'){
-					if(Object.inObject(tar, o, key)) return true;
-				}
-			}
-		} else {
-			for(k in obj){
-				o = obj[k];
-				if(o && o.constructor.name == 'Object'){
-					if(Object.inObject(tar, o)) return true;
-				} else if(tar === o) return true;
-			}
-		}
-		return false;
-	};
 	nativePro.addForin(Object, nativePro, false, false, false);
 	nativePro = {};
-	nativePro.inArray = function(obj, key) {
-		var len = this.length, i, o;
-		obj = obj[key] || obj;
-		if(key){
-			for(i = 0; i < len; i++) {
-				o = this[i];
-				if(obj === o) return true;
-				if(Object.inObject(obj, o, key)) return true;
-				if(o instanceof Array) {
-					if(o.inArray(obj, key)) return true;
-				}
-			};
-			return !(i == len);
-		} else {
-			for(i=0; i<len && this[i]!==obj; i++){
-				if(this[i] instanceof Array){
-					if(this[i].inArray(obj)) return true;
-				}
-			};
-			return !(i==len);
-		}
-	};
-	/*nativePro.inArray = function(obj) {
+	nativePro.inArray = function(obj) {
 		var len = this.length, i;
 		for(i=0; i<len && this[i]!==obj; i++);
 		return !(i==len);
-	};*/
+	};
 	nativePro.each = function(fnt) {
 		var len = this.length, i = 0 ,item;
 		if(!(fnt instanceof Function) || len == 0) return;
@@ -101,300 +57,7 @@
 	Object.addForin(Number.prototype, nativePro, false, false);
 	setProto = nativePro = null;
 }(document));
-(function(win, doc) { //TODO//20180202
-	'use strict';
-	var evtPro = win.EventTarget || win.Node || win.Element;
-	evtPro = evtPro.prototype;
-	
-	evtPro.getEventListeners = function(a) {
-		if (!this.eventListenerList) this.eventListenerList = {};
-		if (a == undefined) return this.eventListenerList;
-		return this.eventListenerList[a];
-	};
-	evtPro.clearEventListeners = function(a) {
-		if (!this.eventListenerList) this.eventListenerList = {};
-		if (a == undefined) {
-			var evtList = this.getEventListeners();
-			for (var x in evtList) this.clearEventListeners(x);
-			return;
-		}
-		var el = this.getEventListeners(a);
-		if (el == undefined) return;
-		for (var i = el.length - 1; i >= 0; --i) {
-			var ev = el[i];if(!ev) continue;
-			this.removeEventListener(a, ev.listener, ev.useCapture);
-		}
-	};
-	
-	function IE8Event(evt){
-		var fn, i, l, e = evt || win.event;
-		e.target = e.srcElement; e.currentTarget = this;
-		var fn = this.getEventListeners(e.type);
-		if (fn == undefined) return;
-		for (i = 0, l = fn.length; i < l; ++i) {
-			fn[i].listener.call(this, e);
-			if(l > fn.length){ --i; l = fn.length; }
-		}
-	} //this.attachEvent('on'+a, b);
-	if(typeof(evtPro.addEventListener)!=="function"){
-		evtPro.addEventListener = function(a){ this['on' + a] = IE8Event; };
-		evtPro.removeEventListener = function(){ /*this.detachEvent('on'+a, b);*/ };
-		win.addEventListener = doc.addEventListener = evtPro.addEventListener;
-		win.removeEventListener = doc.removeEventListener = evtPro.removeEventListener;
-		win.getEventListeners = doc.getEventListeners = evtPro.getEventListeners;
-		win.clearEventListeners = doc.clearEventListeners = evtPro.clearEventListeners;
-		StaticNodeList.prototype.toString = function(){ return '[object StaticNodeList]'; };
-		win.getComputedStyle = function(el){ return el.currentStyle; };
-		Object.prototype.constructor.name = 'Object';
-	}
-	var eve = {_addEventListener: evtPro.addEventListener, _removeEventListener: evtPro.removeEventListener};
-	Object.addForin(evtPro, eve, false, false);
-	evtPro.addEventListener = function(a, b, c) {
-		if (c == undefined) c = false;
-		this._addEventListener(a, b, c);
-		if (!this.eventListenerList) this.eventListenerList = {};
-		if (!this.eventListenerList[a]) this.eventListenerList[a] = [];
-		var EA = this.eventListenerList[a], i, l = EA.length;
-		for(i = 0; i < l; i++){ if(EA[i].listener === b) break; }
-		if(i==l) EA.push( {listener: b, useCapture: c} );
-	};
-	evtPro.removeEventListener = function(a, b, c) {
-		if (c == undefined) c = false;
-		this._removeEventListener(a, b, c);
-		if (!this.eventListenerList) this.eventListenerList = {};
-		if (!this.eventListenerList[a]) this.eventListenerList[a] = [];
-		// find the event in the list
-		for (var i = 0; i < this.eventListenerList[a].length; i++) {
-			if (this.eventListenerList[a][i].listener == b && this.eventListenerList[a][i].useCapture == c) {
-				this.eventListenerList[a].splice(i, 1);
-				break;
-			}
-		}
-		if (this.eventListenerList[a].length == 0) delete this.eventListenerList[a];
-	};
-	evtPro = null;
-}(window, document));
-(function(globals, doc) { //20180807 TODO
-	'use strict';
-	var initTime = Date.now(), mapping = {}, cache = {}, plugins = [],
-		regJS = /\.js$/, regCSS = /\.css$/, curReq = null, initFn = [];
-	var exp = {}, config = {}, wait = {}, alias, errorFn = {}, firstInit = true;
-	
-	function isArr(arr){return (arr instanceof Array) ? true : false;}
-	function sta(q){ return (typeof(q)=="string") ? [q] : (isArr(q) ? q : []); }
-	function isFn(fn){return (fn instanceof Function) ? true : false;}
-	var isIE8 = (function(){ return doc.createEvent === void 0 ? true : false;}());
-	exp.initModule = function(main, exFn) {
-		var kit = exp.kitRequire('main/kit');
-		if(isFn(main)||kit.type(main)=="object"){
-			exFn = main; main = null;
-		}else if(arguments.length==1) return configEvent(main, '', getID());
-		var id = getID(), rely = parseRely(main, exFn, id);
-		if(isFn(exFn)||typeof(exFn)=="object"){
-			initFn.push({mod: create(id, rely), fn: exFn});
-		}
-		if( isReady() ) globals.setTimeout( execute );
-	};
-	exp.define = function(id /*,rely, fn*/) {
-		var fn, rely;
-		if(config.complete) id = toVars(id);
-		if(arguments.length > 2){
-			rely = arguments[1];
-			fn = arguments[2];
-		} else fn = arguments[1];
-		if(isFn(fn) && id){
-			mapping[id] = {mod: create(id, parseRely(rely, fn, id)), fn: fn};
-		} else if(id) exp.initModule(id);
-	};
-	exp.kitRequire = function (id) {
-		id = toVars(id);
-		if(cache[id]) return cache[id];
-		var M = mapping[id], c;
-		if(!M){
-			if(!alias[id]) console.warn(id+'：Module is not define!');
-			return;
-		}
-		c = M.mod.exports = {};
-		cache[id] = M.fn.call(c, exp.kitRequire, c, M.mod) || M.mod.exports;
-		delete mapping[id];
-		return cache[id];
-	};
-	Object.addForin(globals, exp, false, false);
-	function Module(id, rely){
-		this.id = id;
-		this.rely = rely || '';
-		if(config.complete) this.uri = alias[id] || '';
-	}
-	function getID(){
-		for(var i = 0,id='ID'; i < 6; i++) id += Math.floor(Math.random() * 10);
-		return id;
-	}
-	function create(id, rely){ return new Module(id, rely); }
-	function parseRely(urls, fn, id){
-		if(!config.complete) return configEvent(urls, fn, id);
-		urls = sta(urls);
-//		fn = fn.toString().replace(/\/\/.+|\s|"|'/g,'').replace(/\/\*.+?\*\//g,'')
-		fn = fn.toString().replace(/(\/\*[\s\S]+?\*\/)|(\/\/.+)|['"`\s]/g, '')
-		.replace(/{(\w+)}/g, function(o, v){return config.vars[v]||o});
-		var reg = (fn.indexOf('function')==0) ? (/.+?\((.+?)[,)]/).exec(fn) : (/.+?(.+?)\){0,1}=>/).exec(fn);
-		if(!reg||reg[1].indexOf(')')==0) return urls;
-		fn.replace(new RegExp(reg[1]+'\\((.+?)\\)','g'), function(a, w){urls.push(w)});
-		preload(urls);
-		return urls;
-	}
-	//配置
-	Object.addProto(exp.initModule, 'config', function (obj){
-		config = typeof(obj)=="object" ? obj : {};
-		var path = config.paths, p, a, vars = config.vars;
-		alias = config.alias || {};
-		config.alias = {};
-		if(vars){
-			for(a in alias){ config.alias[toVars(a)] = alias[a];}
-			alias = config.alias;
-		} else config.vars = {};
-		if(path){
-			for(p in path){
-				var reg = new RegExp('^'+p);
-				for(a in alias) alias[a] = alias[a].replace(reg, path[p]);
-			}
-		} else config.paths = {};
-		config.complete = true;
-		forWait();
-	}, false, false);
-	Object.addProto(exp.initModule, 'addConfig', function (obj){
-		obj = typeof(obj)=="object" ? obj : {};
-		var kit = exp.kitRequire('main/kit');
-		obj = kit.extend(obj,config);
-		exp.initModule.config(obj);
-	}, false, false);
-	function configEvent(urls, fn, id){ wait[id] = {r:urls, fn:fn}; }
-	function forWait(){
-		var i , len = initFn.length, o, id, r;
-		for (i = 0; i < len; i++) {
-			id = initFn[i].mod.id;
-			if(o = wait[id]){
-				r = parseRely(o.r, o.fn);
-				initFn[i].mod = create(id, r);
-				delete wait[id];
-			}
-		}
-		for (i in wait){
-			o = wait[i];
-			r = parseRely(o.r, o.fn);
-			if(len = mapping[i]){
-				delete mapping[i];
-				id = toVars(i);
-				mapping[id] = {mod: create(id, r), fn: len.fn};
-			}
-		}
-		wait = {};
-		if( isReady() ) globals.setTimeout( execute );
-	}
-	function toVars(str){
-		if(typeof(str)!="string") return str;
-		return str.replace(/{(\w+)}/g, function(o, v){return config.vars[v]||o});
-	}
-	//预加载
-	var preloadObj = {}, head = doc.querySelector('head');
-	function preload(use, isLink, fn, erFn){
-		use = sta(use);
-		for (var i = 0; i < use.length; i++) {
-			if(!regCSS.test(use[i])) {
-				if(preloadObj[use[i]]) continue;
-				if(isLink){
-					preloadObj[use[i]] = use[i];
-					plugins.push(use[i]);
-					errorFn[use[i]] = erFn;
-				} else if(alias[use[i]]) {
-					preloadObj[use[i]] = alias[use[i]];
-					plugins.push(alias[use[i]]);
-				}
-			} else {
-				var rel = doc.getElementsByTagName('link');
-				for (var s = 0; s < rel.length; s++) if(rel[s].href.indexOf(use[i]) != -1) break;
-				if(s != rel.length) continue;
-				var es = doc.createElement('link');
-				es.rel = 'stylesheet';
-				es.type = 'text/css';
-				es.href = use[i];
-				head.appendChild(es);
-			}
-		}
-		if( isFn(fn) ) initFn.push({mod: create(getID()), fn: fn});
-		if(curReq==null && plugins.length==0 && isLink) execute();
-		if(curReq != null || plugins.length == 0) return;
-		request();
-	}
-	function request() {
-		var es = doc.createElement('script');
-		curReq = plugins.shift();
-		es.id = curReq;
-		if(!regJS.test(curReq)) curReq += '.js';
-		es.type = 'text/javascript';
-		es.src = curReq;
-		if(isIE8) es.onreadystatechange = onload;
-		else es.onload = onload;
-		es.onerror = errors;
-		head.appendChild(es);
-	}
-	function onload(e) {
-		if(isIE8){
-			var r = this.readyState;
-			if(r === 'loaded' || r === 'complete') {
-			} else return
-		}
-		this.onreadystatechange = this.onerror = this.onload = null;
-		head.removeChild(this);
-		loading();
-	}
-	function loading() {
-		if(plugins.length > 0){
-			request();
-		} else {
-			curReq = null;
-			if( isReady() ) globals.setTimeout( execute );
-		}
-	}
-	function errors(e) {var f = errorFn[this.id]; if(isFn(f)) {f();} loading();}
-	
-	function isReady(){
-		if ( doc.readyState === "complete" || (doc.readyState !== "loading" && !doc.documentElement.doScroll) ) {
-			return curReq == null ? true : false;
-		} else {
-			doc.addEventListener( "DOMContentLoaded", completed );
-			globals.addEventListener( "load", completed );
-			return false;
-		}
-	}
-	function execute() {
-		if(!config.complete) return;
-		while(initFn.length > 0){
-			if(curReq != null) return;
-			var M = initFn.shift(), entry, c = M.mod.exports = {};
-			if(!isFn(M.fn)) entry =  M.fn;
-			else entry = M.fn.call(c, exp.kitRequire, c, M.mod) || M.mod.exports;
-			if(isFn(entry.init)) entry.init();
-			if(isFn(entry.events)) entry.events();
-		}
-		if(firstInit){
-			firstInit = false;
-			console.log('initTime: ', Date.now() - initTime);
-		}
-		errorFn = {};
-	}
-	function completed() {
-		doc.removeEventListener( "DOMContentLoaded", completed );
-		globals.removeEventListener( "load", completed );
-		if( isReady() ) globals.setTimeout( execute );
-	}
-	Object.addProto(Module.prototype, 'loader', function (src, fn, erFn){
-		preload(src, true, fn, erFn);
-	}, false, false);
-	define('loader', function(){ return Module.prototype.loader; });
-}(window, document));
-/******************************************************************************/
-
-define('main/kit', function (require, exports, module)
+(function (require, exports, module)
 {
 	'use strict';
 	var doc = document, win = window, kit = ToolKit, //TODO
@@ -410,26 +73,6 @@ define('main/kit', function (require, exports, module)
 			return 'android';
 		} else return 'pc';
 	}();
-	var _browser = {};
-	_browser.name = (function(){
-		var n = navigator.userAgent; //取得浏览器的userAgent字符串
-		if(n.indexOf("QQBrowser") > -1) return 'QQ';
-		if(n.indexOf("UBrowser") > -1) return 'UC';
-		if(n.indexOf("QIHU 360") > -1) return '360';
-		if(n.indexOf("Opera") > -1) return 'opera';
-		if(n.indexOf("Firefox") > -1) return 'firefox';
-		if(n.indexOf("Chrome") > -1) return 'chrome';
-		if(n.indexOf("Safari") > -1) return 'safari';
-		if(/(MicroMessenger)/i.test(n)) return 'weixin';
-	    if(n.indexOf("compatible") > -1 && n.indexOf("MSIE") > -1 && n.indexOf("Trident") > -1){
-	        return "IE"; //判断是否IE浏览器
-	    };
-	}());
-	_browser.IEVersion = (function(){
-		var v = 0;
-		navigator.userAgent.replace(/MSIE (.+?);/, function(a, b){v = b;});
-		return parseFloat(v);
-	}());
 	function _isArrayLike(obj) {
 		//obj.propertyIsEnumerable(proName);//是否可枚举的
 		if(kit.type(obj)=='string'||kit.type(obj)=='function'||kit.type(obj)=='window')
@@ -454,35 +97,22 @@ define('main/kit', function (require, exports, module)
 		}
 	}
 	function _isNode(el) { return el instanceof (win.Node || win.Element); }
-	/*root是否包涵el*/
-	function _contains(root, el) {
-		if(!_isNode(root) || !_isNode(el))
-			return false;
-		return root.contains ? root != el && root.contains(el) : 
-			!!(root.compareDocumentPosition(el) & 16);
-	}
 	function _isFn(fn) { return (fn instanceof Function); }
 	function _isObject(obj) { return kit.type(obj) == 'object'; }
 	
 /******************************************************************************/
 	/**
 	 * @description 工具主类
-	 * @author kasumi
+	 * @author leiguangyao
 	 */
 	function ToolKit(selector, el){return new _qs(selector, el);}
 	ToolKit.isArrayLike = _isArrayLike;
-//	ToolKit.addEvent = _addEvent;
-//	ToolKit.clearEvent = _clearEvent;
 	ToolKit.os = _os;
-	ToolKit.browser = _browser;
-	ToolKit.contains=_contains;
 	ToolKit.isObject=_isObject;
 	ToolKit.isFn=_isFn;
 	ToolKit.stage = function() { return doc.compatMode === 'CSS1Compat' ? doc.documentElement: doc.body; };
 	ToolKit.body = function() { return doc.body; }; //CSS1Compat, BackCompat
 	ToolKit.html = function() { return doc.documentElement; };
-//	ToolKit.enterFrame = function(back, elem){requestAnimationFrame.call(win, back, elem);};
-//	ToolKit.clearFrame = function(handler){cancelAnimationFrame.call(win, handler);};
 	ToolKit.toArray = function() {
 		if(Array.from) return Array.from;
 		return function(obj, fn, callee){
@@ -524,15 +154,6 @@ define('main/kit', function (require, exports, module)
 	        } else return 'object';
 	    }
 		return typeString;
-	};
-	ToolKit.extendFn = function(subClass, superClass) {
-		var F = function(){};
-		F.prototype = superClass.prototype;
-		subClass.prototype = new F();
-		subClass._super = F.prototype;
-		Object.addProto(subClass.prototype,'constructor',subClass, false);
-		Object.addProto(superClass.prototype,'constructor',superClass, false);
-		F = null;
 	};
 	/**扩展工具:*/
 	ToolKit.extend = function() {
@@ -611,24 +232,6 @@ define('main/kit', function (require, exports, module)
 		var num = (max > min) ? Math.floor(Math.random() * (max - min + 1)) + min :
 			Math.floor(Math.random() * (min - max + 1)) + max;
 		return num;
-	};
-	ToolKit.mouseX = function(e) {
-		return e.touches ? e.touches[0] ? e.touches[0].clientX :
-			e.changedTouches[0].clientX : e.clientX;
-	};
-	ToolKit.mouseY = function(e) {
-		return e.touches ? e.touches[0] ? e.touches[0].clientY :
-		e.changedTouches[0].clientY : e.clientY;
-	};
-	ToolKit.mouse = function(e) {
-		var point = {};
-		point.x = this.mouseX(e);
-		point.y = this.mouseY(e);
-		return point;
-	};
-	ToolKit.wheel = function(e){
-		if(e.type == 'DOMMouseScroll') return e.detail<0 ? false : true;
-		return e.wheelDelta<0 ? true : false;
 	};
 	function _rem(e){
 //		var w = _os=='pc'?win.innerWidth:Math.min(win.innerWidth, win.innerHeight),
@@ -1139,46 +742,5 @@ define('main/kit', function (require, exports, module)
 	_qsObj.isNull = function() { return this.length <= 0 ? true : false; };
 	Object.addForin(pro, _qsObj, false, false, false);
 	_qsObj = pro = null;
-	return ToolKit;
-});
-define('main/location', function(require, exports, module){
-	var path = window.location.pathname, origin = window.location.protocol+'//',
-		fileName, root, isApp = (origin == 'file://' ? true : false),
-		pageName, pagePath, appFiles = '/appH5/'; //app里的H5根目录
-//	path = '/data/data/com.android.fcsc.broker/files/www/appH5/dycydiscovery/myRecom_01.html';
-	origin += window.location.host;
-	pagePath = path.substring(0, path.lastIndexOf('/') + 1);
-	pageName = path.substring(path.lastIndexOf('/') + 1);
-	exports.path = function(){ return  pagePath};
-	exports.pageName = function(format){ return format ? pageName.split('.', 1)[0] : pageName; };
-	//webH5项目的根路径
-	exports.projectName = function(project){
-		if(project == void 0){
-			return isApp ? appFiles : fileName;
-		} else {
-			appFiles = project ? '/'+project+'/' : '';
-			if(isApp){
-				var last = path.indexOf(appFiles);
-				if(last < 0) console.warn('projectName is error!');
-				fileName = path.substring(0, last) + appFiles;
-			} else  fileName = appFiles || '/';
-			root = origin + fileName;//根路径
-		}
-	};
-	exports.origin = function(){ return origin + '/'; };
-	exports.root = function(){ return root; };
-	exports.isApp = function(){ return isApp; };
-});
-(function(win){
-	var lt = kitRequire('main/location'), r;
-	lt.projectName('toolkit'); //必须,H5根目录
-	r = lt.projectName()=='/' ? lt.origin() : lt.root();
-	kitRequire('loader')(r + 'globalConfig.js', '', function(){initModule.config({});});
-	lt = kitRequire('main/kit').screenFix();
-	r = false;
-	if(lt.os != 'pc'){
-		if(win.innerWidth >=576) r = 56;
-	} else r = 50;
-	lt.offFix(r);
-	lt('#IDkit').detach().dispose(false);
-}(window));
+	return win.kit = ToolKit;
+}());

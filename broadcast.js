@@ -1,32 +1,31 @@
 /*
  * 消息通知
  * @author: leiguangyao;
- * @date: 20180823-20180904;
+ * @date: 20180823-20180910;
  */
 ;define('broadcast', function (require, exports)
 {
 	var kit = require('main/kit'), pro = Broadcast.prototype;
 	
-	function Broadcast(data, delay, speed){
-		var wrap, timer = kit.timer('linear'), isReverse = false,
-		count, max, distance, direction, complete, item, list, wait;
-		delay = Math.abs(delay) || 5000;
+	function Broadcast(delay, speed){
+		var wrap, timer = kit.timer('linear'), isReverse = false, data = [],
+			count = 0, max, distance, direction, item, list, wait,
+			complete, click;
+		delay = Math.abs(delay) || 3000;
 		speed = Math.abs(speed) || 1000;
 		
-		(function(){
-			updata(data);
-		}());
 		
-		function updata(data){
-			if(!(data instanceof Array)||data.length==0) {
-				throw new Error('Broadcast: data is not Array or null');
-			}
+		function updata(arr){
+			data = arr;
 			max = data.length;
-			count = 0;
+			if(max == 1){
+				wrap.html(kit.template(data[0], item));
+			}
 			data.push(data[0]);
 		};
 		
 		function moveTo(per, args){
+			if(max < 2) return;
 			var dist = distance * per;
 			if(isReverse){
 				dist -= distance;
@@ -38,12 +37,18 @@
 			list.dispose();
 			round();
 			wait = setTimeout(function(){ timer.start(speed, moveTo); }, delay);
+			if(complete instanceof Function) complete(list, count, data.slice(0, max));
 		}
 		timer.complete(finish);
-		
-		this.updata = function(data){
-			updata(data);
+		//第二步
+		this.updata = function(arr){
+			if(!(arr instanceof Array)||arr.length==0) {
+				max = 0;
+				data = [];
+				wrap.html('');
+			} else updata(arr);
 		};
+		//第一步
 		this.setItem = function(id, dom){
 			wrap = kit(id).css('overflow', 'hidden');
 			item = dom;
@@ -65,7 +70,9 @@
 			if(isReverse){
 				list.css(direction, Math.abs(distance));
 			}
+			if(click instanceof Function) list.click(click);
 		}
+		//第三步
 		this.start = function(dire){
 			this.stop();
 			switch (dire){
@@ -84,15 +91,13 @@
 			distance *= -1;
 			round();
 			timer.start(speed, moveTo);
-//			timer.stop();
 		};
 		this.stop = function(){
 			clearTimeout(wait);
 			timer.stop();
 		};
-		this.complete = function(fn){
-			complete = fn;
-		};
+		this.click = function(fn){ click = fn; }
+		this.complete = function(fn){ complete = fn; };
 	}
 	return Broadcast;
 });

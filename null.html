@@ -11,9 +11,7 @@
 	<meta http-equiv="Expires" content="0" />
 	<title>空样式</title>
 	<link rel="stylesheet" type="text/css" href="css/initTag.css"/>
-	<!--<script src="libs/plugins/babel.min.js"></script>-->
-	<!--<script type="text/babel" src="ABC.js" ></script>-->
-	<script type="text/javascript" src="libs/simplekit.js"></script>
+	<script type="text/javascript" src="libs/kit.js"></script>
 	<!--<script src="js/libs/sea-debug.js"></script>-->
 </head>
 <style>
@@ -85,21 +83,8 @@
 </html>
 <script type="text/javascript">
 
+	console.log(kit('div'))
 
-initModule(function(require)
-{
-	var kit = require('main/kit');
-
-	require('loader')('ABC.js', function(re){
-		var abc = re('abc');
-	});
-	kit('#AA').click(function(e){
-		kit.defaultEvent(e);
-		
-	});
-	
-	
-});
 
 	/*try{
 		var socket = new WebSocket('ws://localhost:8020/toolkit/null.html');

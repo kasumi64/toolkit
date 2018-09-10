@@ -16,8 +16,13 @@
 		function bingo(master, fn){
 			if(!(typeof master == 'string'&&fn instanceof Function)) return false;
 			if(!dictionary[master]) dictionary[master] = [];
-			if(dictionary[master].inArray(fn)) return false;
+			if(isHas(fn, dictionary[master])) return false;
 			return true;
+		}
+		function isHas(fn, arr){
+			var i, len = arr.length;
+			for(i=0; i<len && arr[i]!==fn; i++);
+			return !(i==len);
 		}
 		//绑定
 		this.on = function(master, fn)

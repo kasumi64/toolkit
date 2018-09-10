@@ -87,28 +87,22 @@ initModule(['scrollPage', 'scrollMobile'],function(require)
 //	acar.setYaxis(true);
 
 
-
+	
 	
 	kit('#ck1').click(function(){
-		var div=kit('div');
-		debugger
-		div.mouseout(function(e){
-			
-		});
+		bc.stop()
 	});
 	kit('#ck2').click(function(){
-		
+		bc.start('top');
 	});
 	
 	
 	var bc = require('broadcast');
 	var jsons = [{txt:'ABC'},{txt:'123'},{txt:'qyt89885'},{txt:'_ABC_89'}];
-	bc = new bc(jsons, 1000, 3000);
+	bc = new bc();
 	bc.setItem('.broadcast', '<p class="item">${{txt}}$</p>');
+	bc.updata(jsons);
 	bc.start('top');
-	
-	
-	
 	
 	
 	

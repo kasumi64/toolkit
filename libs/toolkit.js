@@ -1660,7 +1660,7 @@ define('main/kit', function(require, exports, module)
 		};
 		pro.dispose = function(deep){
 			if(deep===true) this.remove(deep);
-			else this.off(null, '', '', evt);
+			else this.off(null, '', '', deep);
 			this.splice(0, this.length);
 		};
 		pro = null;
