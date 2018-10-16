@@ -36,7 +36,8 @@ define('main/globalVar', function(require, exports, module){
 		observer:       'plugins/observer.js',
 		getDate:        'plugins/getDate.js',
 		http:			'plugins/httpRequest.js',
-		broadcast:		'broadcast.js'
+		broadcast:		'plugins/broadcast.js',
+		banner:		'banner.js'
 	};
 	config.vars = {
 		kit:	'main/kit',

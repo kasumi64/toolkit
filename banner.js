@@ -1,17 +1,17 @@
 /*
- * 消息通知
+ * banner
  * @author: leiguangyao;
- * @date: 20180823-20180910;
+ * @date: 20180911-20180910;
  */
-;define('broadcast', function (require, exports)
+;define('banner', function (require, exports)
 {
-	var kit = require('main/kit'), pro = Broadcast.prototype;
+	var kit = require('main/kit');
 	
-	function Broadcast(delay, speed){
-		var wrap, timer = kit.timer('linear'), isReverse = false, data = [],
-			count = 0, max, distance, direction, item, list, wait,
+	function Banner(delay, speed){
+		var wrap, cons, dot, timer = kit.timer('linear'), isReverse = false,
+			data = [], count = 0, max, distance, direction, item, list, wait,
 			complete, click;
-		delay = Math.abs(delay) || 3000;
+		delay = Math.abs(delay) || 5000;
 		speed = Math.abs(speed) || 1000;
 		
 		
@@ -19,7 +19,7 @@
 			data = arr;
 			max = data.length;
 			if(max == 1){
-				wrap.html(kit.template(data[0], item));
+				cons.html(kit.template(data[0], item));
 			}
 			data.push(data[0]);
 		};
@@ -45,22 +45,23 @@
 			if(!(arr instanceof Array)||arr.length==0) {
 				max = 0;
 				data = [];
-				wrap.html('');
+				cons.html('');
 			} else updata(arr);
 		};
 		//第一步
 		this.setItem = function(id, dom){
-			wrap = kit(id).css('overflow', 'hidden');
+			cons = kit('<div></div>').css({position:'relative',width:'100%',height:'100%'});
+			wrap = kit(id).css('overflow', 'hidden').append(cons);
 			item = dom;
 		};
 		function round(){
-			var dire = 'right bottom', jsons = data.slice(count, count + 2);
+			var dire = 'right bottom', jsons = data.slice(count, count + 3);
 			if(dire.indexOf(direction) > -1) {
 				isReverse = true;
 				jsons = jsons.reverse();
 			}
-			wrap.html(kit.template(jsons, item));
-			list = kit(wrap[0].children);
+			cons.html(kit.template(jsons, item));
+			list = kit(cons[0].children);
 			switch (direction){
 				case 'top': case 'bottom':
 					list.css({display:'block', position: 'relative'}); break;
@@ -83,11 +84,12 @@
 			}
 			switch (direction){
 				case 'top': case 'bottom':
-					distance = wrap.getStyle('height'); break;
+					distance = wrap[0].clientHeight; break;
 				default:
-					wrap.css({'white-space':'nowrap'});
-					distance = wrap.getStyle('width'); break;
+					cons.css({'white-space':'nowrap'});
+					distance = wrap[0].clientWidth; break;
 			}
+			console.log(distance)
 			distance *= -1;
 			round();
 			timer.start(speed, moveTo);
@@ -99,5 +101,5 @@
 		this.click = function(fn){ click = fn; }
 		this.complete = function(fn){ complete = fn; };
 	}
-	return Broadcast;
+	return Banner;
 });

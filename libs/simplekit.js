@@ -1,6 +1,6 @@
 /*
  * @author: leiguangyao;
- * @date: 20160902--20180807;
+ * @date: 20160902--20181015;
  */
 ;(function(doc){ //20180712
 	'use strict';
@@ -998,6 +998,7 @@ define('main/kit', function (require, exports, module)
 		/**简单的加入元素*/
 		function _simpleAppend(el)
 		{
+			if(this.isNull()) return this;
 			if(typeof(el)=="string"){
 				if(_regHtml.test(el)){
 					_div.innerHTML = el;
@@ -1126,7 +1127,7 @@ define('main/kit', function (require, exports, module)
 		};
 		pro.dispose = function(deep){
 			if(deep===true) this.remove(deep);
-			else this.off(null, '', '', deep);
+			else this.off();
 			this.splice(0, this.length);
 		};
 		pro = null;

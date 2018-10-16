@@ -1,6 +1,6 @@
 /*
  * @author: leiguangyao;
- * @date: 20160902--201800910;
+ * @date: 20160902--20181015;
  */
 ;(function(doc){ //20180712
 	'use strict';
@@ -90,7 +90,7 @@
 	function _clearEvent(el, type, fn, bubble) {
 		if(el.removeEventListener){
 			if(fn) el.removeEventListener(type, fn, bubble);
-			else el.clearEventListeners(type);
+			else if(el.clearEventListeners) el.clearEventListeners(type);
 		} else if(_isArrayLike(el)){
 			for (var i = 0, l = el.length; i < l; i++)
 				_clearEvent(el[i], type, fn, bubble);
@@ -601,6 +601,7 @@
 		/**简单的加入元素*/
 		function _simpleAppend(el)
 		{
+			if(this.isNull()) return this;
 			if(typeof(el)=="string"){
 				if(_regHtml.test(el)){
 					_div.innerHTML = el;
@@ -729,7 +730,7 @@
 		};
 		pro.dispose = function(deep){
 			if(deep===true) this.remove(deep);
-			else this.off(null, '', '', deep);
+			else this.off();
 			this.splice(0, this.length);
 		};
 		pro = null;

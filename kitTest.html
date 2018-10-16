@@ -32,7 +32,11 @@
 	</div>
 	
 	<div class="broadcast"></div>
-	
+	<select>
+		<option>asdfs</option>
+		<option>123</option>
+		<option>787dfggg</option>
+	</select>
 	<div id="pp">
 		<div class="warp">
 			<div>第一个</div><div>第二个</div><div>第三个</div>
@@ -90,14 +94,15 @@ initModule(['scrollPage', 'scrollMobile'],function(require)
 	
 	
 	kit('#ck1').click(function(){
-		bc.stop()
+		bc.stop();
+//		console.log(new DOMParser);
 	});
 	kit('#ck2').click(function(){
-		bc.start('top');
+		bc.start();
 	});
 	
 	
-	var bc = require('broadcast');
+	var bc = require('banner');
 	var jsons = [{txt:'ABC'},{txt:'123'},{txt:'qyt89885'},{txt:'_ABC_89'}];
 	bc = new bc();
 	bc.setItem('.broadcast', '<p class="item">${{txt}}$</p>');
