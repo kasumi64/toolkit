@@ -1,6 +1,6 @@
 /*
  * @author: leiguangyao;
- * @date: 20160523--20181015;
+ * @date: 20160523--20181018;
  */
 ;(function(doc){ //20180712
 	'use strict';
@@ -685,9 +685,11 @@ define('main/kit', function(require, exports, module)
 		dom = dom.replace(_regSpace, '');
 		for (i = 0; i < len; i++) {
 			obj = jsons[i];
-			if(obj instanceof Array){
-				temp.push(kit.template(obj, dom, origin, getArr));
-			} else temp.push(dom.replace(_regTemplate, replace));
+			if(!(obj instanceof Array)){
+				obj['_i_'] = i;
+				temp.push(dom.replace(_regTemplate, replace));
+				delete obj['_i_'];
+			} else temp.push(kit.template(obj, dom, origin, getArr));
 		}
 		function replace(rep, val){
 			if(obj[val] === 0) obj[val] += '';
@@ -1336,7 +1338,9 @@ define('main/kit', function(require, exports, module)
 	/**********************************************/
 		/*只删除元素*/
 		pro.detach = function() {
-			return _each.call(this, function(el){ _div.appendChild(el); });
+			_each.call(this, function(el){ _div.appendChild(el); });
+			_div.innerHTML = '';
+			return this;
 		};
 		/*删除元素与事件*/
 		pro.remove = function(deep) {
