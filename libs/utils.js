@@ -252,7 +252,7 @@ define('main/utils', function (require, exports, module)
 	}
 	var _storage = {
 		set : function(val) {
-			if(_isObject(val)) val = _toStr(val) + '^~Obj';
+			if(kit.isObject(val)) val = _toStr(val) + '^~Obj';
 			else val += '^~Str';
 			return _compile(_compile(val));
 		}, get : function(val) {
