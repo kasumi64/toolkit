@@ -564,10 +564,16 @@ define('main/kit', function (require, exports, module)
 		return target;
 	};
 	ToolKit.info = function(obj, val) {
-		for(var k in obj){
-			if(obj[k] instanceof Function && val){
-				console.log(k+'--',obj[k]());
-			} else  console.log(k+'--',obj[k]);
+		var val, k;
+		for(k in obj){
+			val = obj[k];
+			if (only == 1) {
+				if(val instanceof Function) console.log(k+'--', val);
+			} else if (only == 2) {
+				console.log(k+'--', val);
+			} else {
+				if(!(val instanceof Function)) console.log(k+'--', val);
+			}
 		}
 	};
 	ToolKit.defaultEvent = function(e,def,stopEvent) {
@@ -1143,6 +1149,7 @@ define('main/kit', function (require, exports, module)
 	_qsObj.init = _qsInit;
 	_qsObj.isNull = function() { return this.length <= 0 ? true : false; };
 	Object.addForin(pro, _qsObj, false, false, false);
+	Object.addProto(ToolKit, 'constructor', _qs, false);
 	_qsObj = pro = null;
 	return ToolKit;
 });

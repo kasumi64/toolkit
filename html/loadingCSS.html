@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+	<meta charset="UTF-8">
+	<title></title>
+</head>
+
+<body>
+	<div id="loading-root" class="loading close" style="display: block;">
+		<div class="cover"></div>
+		<div class="loader">
+			<div class="lds-double-ring">
+				<div></div>
+				<div></div>
+			</div>
+		</div>
+	</div>
+</body>
+<style>
+
+
+@keyframes lds-double-ring {
+    0% {
+        -webkit-transform: rotate(0);
+        transform: rotate(0)
+    }
+
+    to {
+        -webkit-transform: rotate(1turn);
+        transform: rotate(1turn)
+    }
+}
+
+@-webkit-keyframes lds-double-ring {
+    0% {
+        -webkit-transform: rotate(0);
+        transform: rotate(0)
+    }
+
+    to {
+        -webkit-transform: rotate(1turn);
+        transform: rotate(1turn)
+    }
+}
+
+@keyframes lds-double-ring_reverse {
+    0% {
+        -webkit-transform: rotate(0);
+        transform: rotate(0)
+    }
+
+    to {
+        -webkit-transform: rotate(-1turn);
+        transform: rotate(-1turn)
+    }
+}
+
+@-webkit-keyframes lds-double-ring_reverse {
+    0% {
+        -webkit-transform: rotate(0);
+        transform: rotate(0)
+    }
+
+    to {
+        -webkit-transform: rotate(-1turn);
+        transform: rotate(-1turn)
+    }
+}
+
+.loading .lds-double-ring {
+    position: relative
+}
+
+.loading .lds-double-ring div {
+    position: absolute;
+    width: 160px;
+    height: 160px;
+    top: 20px;
+    left: 20px;
+    border-radius: 50%;
+    border-color: #f0b434 transparent;
+    border-style: solid;
+    border-width: 6px;
+    -webkit-animation: lds-double-ring 1s linear infinite;
+    animation: lds-double-ring 1s linear infinite
+}
+
+.loading .lds-double-ring div:nth-child(2) {
+    width: 144px;
+    height: 144px;
+    top: 28px;
+    left: 28px;
+    border-color: transparent #e87a90;
+    -webkit-animation: lds-double-ring_reverse 1s linear infinite;
+    animation: lds-double-ring_reverse 1s linear infinite
+}
+
+.loading .lds-double-ring {
+    width: 200px;
+    height: 200px;
+    transform: translate(-50%,-50%) scale(1) translate(50%,50%);
+    -webkit-transform: translate(-50%,-50%) scale(1) translate(50%,50%);
+    -moz-transform: translate(-50%,-50%) scale(1) translate(50%,50%);
+    -ms-transform: translate(-50%,-50%) scale(1) translate(50%,50%);
+    -o-transform: translate(-50%,-50%) scale(1) translate(50%,50%)
+}
+
+.loading,.loading .cover {
+    position: fixed;
+    /* overflow:hidden; */
+    top: 0;
+}
+
+.loading .cover {
+    width: 100%;
+    height: 100%;
+    background-color: #3c3c3c
+}
+
+.loading .loader {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    z-index: 1300;
+    transform: translate(-50%,-50%);
+    -webkit-transform: translate(-50%,-50%);
+    -moz-transform: translate(-50%,-50%);
+    -ms-transform: translate(-50%,-50%);
+    -o-transform: translate(-50%,-50%)
+}
+
+.loading.close {
+    z-index: 999;
+    /* visibility:hidden; */
+    transition: all 1s linear;
+    -webkit-transition: all 1s linear;
+    -moz-transition: all 1s linear;
+    -ms-transition: all 1s linear;
+    -o-transition: all 1s linear;
+}
+
+.loading.close .cover,.loading.close .loader {
+    opacity: 1;
+    transition: all .5s linear;
+    -webkit-transition: all .5s linear;
+    -moz-transition: all .5s linear;
+    -ms-transition: all .5s linear;
+    -o-transition: all .5s linear;
+}
+
+.loading.open {
+    z-index: 1200;
+    visibility: visible;
+    transition: visibility 1s linear;
+    -webkit-transition: visibility 1s linear;
+    -moz-transition: visibility 1s linear;
+    -ms-transition: visibility 1s linear;
+    -o-transition: visibility 1s linear
+}
+
+.loading.open .cover {
+    opacity: .99;
+    transition: opacity 2s linear;
+    -webkit-transition: opacity 2s linear;
+    -moz-transition: opacity 2s linear;
+    -ms-transition: opacity 2s linear;
+    -o-transition: opacity 2s linear
+}
+
+.loading.open .loader {
+    opacity: 1;
+    transition: opacity 1s linear;
+    -webkit-transition: opacity 1s linear;
+    -moz-transition: opacity 1s linear;
+    -ms-transition: opacity 1s linear;
+    -o-transition: opacity 1s linear
+}
+
+</style>
+</html>

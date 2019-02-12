@@ -88,15 +88,16 @@ select {
 	appearance: none;
 	outline: 0;
 }
+
 ::-webkit-scrollbar {
-	width: 1px;
-	height: 1px;
+	width: 10px;
+	height: 10px;
 	display: none;
 }
 ::-webkit-scrollbar-track,
-::-webkit-scrollbar-thumb {
-	border-radius: 999px;
-	border: 5px solid transparent;
+ ::-webkit-scrollbar-thumb {
+	border-radius: 20px;
+	border: 1px solid #F5F7FA;
 }
 ::-webkit-scrollbar-track {
 	box-shadow: 1px 1px 5px rgba(0, 0, 0, 0.2) inset;
@@ -104,7 +105,8 @@ select {
 ::-webkit-scrollbar-thumb {
 	min-height: 20px;
 	background-clip: content-box;
-	box-shadow: 0 0 0 5px rgba(0, 0, 0, 0.2) inset;
+	box-shadow: 1px 1px 0 1px rgba(0, 0, 0, .1) inset;
+	background: rgba(0, 0, 0, .1);
 }
 ::-webkit-scrollbar-corner {
 	background: transparent;
@@ -115,7 +117,9 @@ select {
 ::-webkit-clear-button {
 	-webkit-appearance: none;
 }
-template {display: none!important;}
+template {
+	display: none!important;
+}
 html {
 	width: 100%;
 	font-size: 100px;
