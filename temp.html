@@ -18,9 +18,8 @@
 		img{width: 100%; position: static;}
 		#static{position: static;background: blue;margin: 10px 5px;}
 	</style>
-	<script id="IDkit" src="libs/simplekit.js" type="text/javascript"></script>
-	<!--<script id="IDkit" src="libs/toolkit.js"></script>-->
-	
+	<!--<script id="IDkit" src="libs/simplekit.js" type="text/javascript"></script>-->
+	<script id="IDkit" src="libs/toolkit.js"></script>
 </head>
 <body id="body">
 	<button id="ck">点击按钮</button>
@@ -56,28 +55,26 @@ initModule(['jquery3','http'], function(req, exports, module)
 	var doc = document, win = window;
 //	kit.screenFix(50);
 
-
+	var http = req('fetch');
+	var obs = req('bingoData')();
 	
+	console.log(obs)
 	win.addEventListener('keydown',function(e){
 		//13enter 32space
-		console.log(e.keyCode)
+		// console.log(e.keyCode);
+		
+		
 	});
 	
-	var http = req('fetch');
-	
+	var s = obs.polyfill( {} )
 	function ck(e){
-//		if(navigator.userAgent.indexOf("Chrome") > -1){}
-//		console.log(navigator.clipboard.writeText('AGC')); //document.execCommand
-//		async().then(V=>console.info(V));
-
-
+		/* if(navigator.userAgent.indexOf("Chrome") > -1){}
+		console.log(navigator.clipboard.writeText('AGC')); //document.execCommand
+		async().then(V=>console.info(V)); */
 		
-		
-		http().json('http://localhost:8040/php/Hphp/sv.php',{a:88},(j)=>{
-			
+		/* http().json('http://localhost:8040/php/Hphp/sv.php',{a:88},(j)=>{
 			console.log([j]);
-			
-		});
+		}); */
 		
 	}
 
@@ -108,7 +105,7 @@ initModule(['jquery3','http'], function(req, exports, module)
 	}
 	function events(){
 		kit('#ck').click(ck);
-		kit('#del').click(del);
+		// kit('#del').click(del);
 	}
 	
 	function yc(w, h){

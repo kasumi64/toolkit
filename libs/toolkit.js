@@ -1,6 +1,6 @@
 /*
  * @author: leiguangyao;
- * @date: 20160523--20181018;
+ * @date: 20160523--20190411;
  */
 ;(function(doc){ //20180712
 	'use strict';
@@ -9,8 +9,8 @@
 	 * @param  {Object} target         目标对像
 	 * @param  {String} keys           属性名，或函数名
 	 * @param  {[type]} methods        属性值，或函数体，无用null
-	 * @param  {Boolean} writable      能否修改属性，默认true。
 	 * @param  {Boolean} enumerable    能否用for-in枚举，默认true。
+	 * @param  {Boolean} writable      能否修改属性，默认true。
 	 * @param  {Boolean} configurable  是否能通过delete删除属性，默认true。
 	 */
 	var setProto = function (){
@@ -63,7 +63,7 @@
 		}
 		return false;
 	};
-	nativePro.addForin(Object, nativePro, false, false, false);
+	nativePro.addForin(Object, nativePro, false, true, false);
 	nativePro = {};
 	nativePro.inArray = function(obj, key) {
 		var len = this.length, i, o;
@@ -103,18 +103,18 @@
 		} while(++i < len);
 		item = null;
 	};
-	Object.addForin(Array.prototype, nativePro, false, false);
+	Object.addForin(Array.prototype, nativePro, false);
 	nativePro = {};
 	/*保留几位小数*/
 	nativePro.toFixNum = function(num) { return parseFloat(this.toFixed(num)); };
-	Object.addForin(Number.prototype, nativePro, false, false);
+	Object.addForin(Number.prototype, nativePro, false);
 	setProto = nativePro = null;
 }(document));
-(function(win, doc) { //TODO //20180202
+(function(win, doc) { //TODO //20190411
 	'use strict';
 	var evtPro = win.EventTarget || win.Node || win.Element;
 	evtPro = evtPro.prototype;
-	
+	if(typeof(evtPro.getEventListeners)=="function") return;
 	evtPro.getEventListeners = function(a) {
 		if (!this.eventListenerList) this.eventListenerList = {};
 		if (a == undefined) return this.eventListenerList;
@@ -157,7 +157,7 @@
 		Object.prototype.constructor.name = 'Object';
 	}
 	var eve = {_addEventListener: evtPro.addEventListener, _removeEventListener: evtPro.removeEventListener};
-	Object.addForin(evtPro, eve, false, false);
+	Object.addForin(evtPro, eve, false);
 	evtPro.addEventListener = function(a, b, c) {
 		if (c == undefined) c = false;
 		this._addEventListener(a, b, c);
@@ -228,7 +228,7 @@
 		delete mapping[id];
 		return cache[id];
 	};
-	Object.addForin(globals, exp, false, false);
+	Object.addForin(globals, exp, false);
 	function Module(id, rely){
 		this.id = id;
 		this.rely = rely || '';
@@ -269,13 +269,13 @@
 		} else config.paths = {};
 		config.complete = true;
 		forWait();
-	}, false, false);
+	}, false);
 	Object.addProto(exp.initModule, 'addConfig', function (obj){
 		obj = typeof(obj)=="object" ? obj : {};
 		var kit = exp.kitRequire('main/kit');
 		obj = kit.extend(obj,config);
 		exp.initModule.config(obj);
-	}, false, false);
+	}, false);
 	function configEvent(urls, fn, id){ wait[id] = {r:urls, fn:fn}; }
 	function forWait(){
 		var i , len = initFn.length, o, id, r;
@@ -398,7 +398,7 @@
 	}
 	Object.addProto(Module.prototype, 'loader', function (src, fn, erFn){
 		preload(src, true, fn, erFn);
-	}, false, false);
+	}, false);
 	define('loader', function(){ return Module.prototype.loader; });
 }(window, document));
 /******************************************************************************/
@@ -609,11 +609,16 @@ define('main/kit', function(require, exports, module)
 		var F = function(){};
 		F.prototype = superClass.prototype;
 		subClass.prototype = new F();
-		subClass._super = F.prototype;
-		Object.addProto(subClass.prototype,'constructor',subClass, false);
+		var obj = { configurable: true, enumerable: false, writable: true };
+		obj.value = F.prototype;
+		Object.defineProperty(subClass.prototype,'super', obj);
+		Object.defineProperty(subClass,'super', obj);
+		obj.value = subClass;
+		Object.defineProperty(subClass.prototype,'constructor', obj);
 		//手动还原超类的构造器,防止超类忘记写。
-		Object.addProto(superClass.prototype,'constructor',superClass, false);
-		F = null;
+		obj.value = superClass;
+		Object.defineProperty(superClass.prototype,'constructor', obj);
+		F = obj = null;
 	};
 	/**扩展工具:*/
 	ToolKit.extend = function() {
@@ -685,7 +690,7 @@ define('main/kit', function(require, exports, module)
 	 * @example <template id='tl'><p>{{rep}}</p></template>
 	 * template({{rep:'我被替换了'}},tl.innerHTML);
 	 */
-	ToolKit.template = function(data, dom, origin,reArr){
+	ToolKit.template = function(jsons, dom, origin, getArr){
 		if(!(jsons instanceof Array)) jsons = [jsons];
 		var temp = [], i, len = jsons.length, obj;
 		dom = dom.replace(_regSpace, '');
@@ -1683,7 +1688,7 @@ define('main/kit', function(require, exports, module)
 	_qsObj.splice = _utilArr.splice;
 	_qsObj.init = _qsInit;
 	_qsObj.isNull = function() { return this.length <= 0 ? true : false; };
-	Object.addForin(pro, _qsObj, false, false, false);
+	Object.addForin(pro, _qsObj, false, true, false);
 	Object.addProto(ToolKit, 'constructor', _qs, false);
 	_qsObj = pro = null;
 	return ToolKit;

@@ -3,7 +3,7 @@
  * @author: leiguangyao;
  * @date: 20170706-20180816;
  */
-;define('observer', function (require, exports)
+;define('observer_es5', function (require, exports)
 {
 	function Observer()
 	{

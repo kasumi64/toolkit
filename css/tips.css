@@ -1,4 +1,5 @@
 @charset "utf-8";
+@import url("initTag.min.css");
 /****************** 按钮提示框 *********************/
 #tip{
 	display: block;

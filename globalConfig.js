@@ -18,6 +18,8 @@ define('main/globalVar', function(require, exports, module){
 	config.alias = {
 		'{utils}':		'libs/utils.js',
 		vue:            'vue/vue.min.js',
+		bingoData:		'vue/bingoData.js',
+		renderData: 	'vue/renderData.js',
 		jquery1:        'jq/jquery-1.12.4.min.js',
 		jquery2:        'jq/jquery-2.2.4.min.js',
 		jquery3:        'jq/jquery-3.3.1.min.js',
@@ -33,11 +35,11 @@ define('main/globalVar', function(require, exports, module){
 		scrollMobile:   'plugins/scrollMobile.js',
 		stage:          'plugins/stage.js',
 		hitTest:        'plugins/hitTest.js',
-		observer:       'plugins/observer.js',
+		observer_es5:   'plugins/observer_es5.js',
 		getDate:        'plugins/getDate.js',
 		http:			'plugins/httpRequest.js',
 		broadcast:		'plugins/broadcast.js',
-		banner:		'banner.js'
+		banner:			'banner.js'
 	};
 	config.vars = {
 		kit:	'main/kit',

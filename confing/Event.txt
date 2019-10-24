@@ -10,6 +10,9 @@ cut：在发生剪切操作的时候触发;
 beforepaste：在发生粘贴操作前触发;
 paste：在发生粘贴操作的时候触发。
 
+e.cancelBubble = true; //@click.stop 冒泡
+e.preventDefault();  //@contextmenu.prevent 默认行为
+
 
 img.ondragstart = function(e){ event.dataTransfer.setData('text', event.target.id)//拖拽数据传递对象}
 div.ondrop = function(e){

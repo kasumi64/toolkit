@@ -173,6 +173,27 @@ define('main/utils', function (require, exports, module)
 {
 	var kit = require('main/kit'), ToolKit = exports;
 	
+	/**
+	* Checks if an object could be an instantiable class.
+	* @returns {boolean}
+	*/
+	ToolKit.isClass = function(fn){
+		if (typeof fn !== "function") return false;
+		if (fn.prototype === void 0) return false;
+		if (fn.prototype.constructor !== fn) return false;
+		//ES6
+		var str = fn.toString();
+		if (str.slice(0, 5) === "class") return true;
+		if (str.slice(0, 5) === "async") return false;
+		//有没有实例属性
+		if (Object.getOwnPropertyNames(fn.prototype).length >= 2) return true;
+		if (/this\./.test(str)) return true;
+		//匿名函数
+		if (fn.name === '') return false;
+		if (/^function \(|^function anonymous/.test(str)) return false;
+		return true;
+	};
+	
 	//随机验证码verify
 	ToolKit.randomCode = function(num){
 		var s = '', len = parseInt(num), i;

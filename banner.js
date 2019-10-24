@@ -1,7 +1,7 @@
 /*
  * banner
  * @author: leiguangyao;
- * @date: 20180911-20180910;
+ * @date: 20180911-20180913;
  */
 ;define('banner', function (require, exports)
 {

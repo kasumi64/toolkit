@@ -1,9 +1,6 @@
 
 
 
-18603079936   147   467.40
-18617003064   19    253.80
-
 
 stack, slice, queue, tick, method--方法, abstract--抽象类
 elmes.getBoundingClientRect();
@@ -213,7 +210,25 @@ var options = {
 	attributes: true,
 	attributeFilter: ['style']
 };
-function resize(){}
+listen.observe(target, options);
+function resize(mutations,observe){}
+/**
+ * MutationObserver对象有三个方法，分别如下：
+
+observe：设置观察目标，接受两个参数，target：观察目标，options：通过对象成员来设置观察选项
+disconnect：阻止观察者观察任何改变
+takeRecords：清空记录队列并返回里面的内容
+关于observe方法中options参数有已下几个选项：
+
+childList：设置true，表示观察目标子节点的变化，比如添加或者删除目标子节点，不包括修改子节点以及子节点后代的变化
+attributes：设置true，表示观察目标属性的改变
+characterData：设置true，表示观察目标数据的改变
+subtree：设置为true，目标以及目标的后代改变都会观察
+attributeOldValue：如果属性为true或者省略，则相当于设置为true，表示需要记录改变前的目标属性值，设置了attributeOldValue可以省略attributes设置
+characterDataOldValue：如果characterData为true或省略，则相当于设置为true,表示需要记录改变之前的目标数据，设置了characterDataOldValue可以省略characterData设置
+attributeFilter：如果不是所有的属性改变都需要被观察，并且attributes设置为true或者被忽略，那么设置一个需要观察的属性本地名称（不需要命名空间）的列表
+
+ */
 /****************** 变动观察器end *********************/
 
 
