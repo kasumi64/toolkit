@@ -368,7 +368,35 @@ define('main/utils', function (require, exports, module)
 	    return out;
 	};
 	
+	//将字符串转换成二进制形式，中间用空格隔开
+	function strToBinary(str){
+		if(typeof str != "string") str +=''; 
+	    var result = [], len =str.length;
+	    // var list = str.split("");
+	    for(var i=0; i<len; i++){
+	        if(i != 0){
+	            result.push(" ");
+	        }
+			var item = str[i];
+			console.log(item.charCodeAt())
+	        var binaryStr = item.charCodeAt().toString(2);
+	        result.push(binaryStr);
+	    }   
+	    return result.join("");
+	}
 	
+	//将二进制字符串转换成Unicode字符串
+	function binaryToStr(str){
+	    var result = [];
+	    var list = str.split(" ");
+	    for(var i=0;i<list.length;i++){
+	         var item = list[i];
+	         var asciiCode = parseInt(item,2);
+	         var charValue = String.fromCharCode(asciiCode);
+	         result.push(charValue);
+	    }
+	    return result.join("");
+	}
 	
 	
 	return exports;

@@ -1,5 +1,5 @@
 /**
- * Sea.js 3.0.0 | seajs.org/LICENSE.md
+ * Sea.js 3.0.3 | seajs.org/LICENSE.md
  */
 (function(global, undefined) {
 
@@ -10,7 +10,7 @@ if (global.seajs) {
 
 var seajs = global.seajs = {
   // The current version of Sea.js being used
-  version: "3.0.0"
+  version: "3.0.3"
 }
 
 var data = seajs.data = {}
@@ -30,12 +30,12 @@ var isObject = isType("Object")
 var isString = isType("String")
 var isArray = Array.isArray || isType("Array")
 var isFunction = isType("Function")
+var isUndefined = isType("Undefined")
 
 var _cid = 0
 function cid() {
   return _cid++
 }
-
 
 /**
  * util-events.js - The minimal events support
@@ -256,34 +256,34 @@ function id2Uri(id, refUri) {
 }
 
 // For Developers
-seajs.resolve = id2Uri;
+seajs.resolve = id2Uri
 
 // Check environment
-var isWebWorker = typeof window === 'undefined' && typeof importScripts !== 'undefined' && isFunction(importScripts);
+var isWebWorker = typeof window === 'undefined' && typeof importScripts !== 'undefined' && isFunction(importScripts)
 
 // Ignore about:xxx and blob:xxx
-var IGNORE_LOCATION_RE = /^(about|blob):/;
-var loaderDir;
+var IGNORE_LOCATION_RE = /^(about|blob):/
+var loaderDir
 // Sea.js's full path
-var loaderPath;
+var loaderPath
 // Location is read-only from web worker, should be ok though
-var cwd = (!location.href || IGNORE_LOCATION_RE.test(location.href)) ? '' : dirname(location.href);
+var cwd = (!location.href || IGNORE_LOCATION_RE.test(location.href)) ? '' : dirname(location.href)
 
 if (isWebWorker) {
   // Web worker doesn't create DOM object when loading scripts
   // Get sea.js's path by stack trace.
-  var stack;
+  var stack
   try {
-    var up = new Error();
-    throw up;
+    var up = new Error()
+    throw up
   } catch (e) {
     // IE won't set Error.stack until thrown
-    stack = e.stack.split('\n');
+    stack = e.stack.split('\n')
   }
   // First line is 'Error'
-  stack.shift();
+  stack.shift()
 
-  var m;
+  var m
   // Try match `url:row:col` from stack trace line. Known formats:
   // Chrome:  '    at http://localhost:8000/script/sea-worker-debug.js:294:25'
   // FireFox: '@http://localhost:8000/script/sea-worker-debug.js:1082:1'
@@ -291,7 +291,7 @@ if (isWebWorker) {
   // Don't care about older browsers since web worker is an HTML5 feature
   var TRACE_RE = /.*?((?:http|https|file)(?::\/{2}[\w]+)(?:[\/|\.]?)(?:[^\s"]*)).*?/i
   // Try match `url` (Note: in IE there will be a tailing ')')
-  var URL_RE = /(.*?):\d+:\d+\)?$/;
+  var URL_RE = /(.*?):\d+:\d+\)?$/
   // Find url of from stack trace.
   // Cannot simply read the first one because sometimes we will get:
   // Error
@@ -300,28 +300,28 @@ if (isWebWorker) {
   //  at http://localhost:8000/_site/dist/sea.js:2:8386
   //  at http://localhost:8000/_site/tests/specs/web-worker/worker.js:3:1
   while (stack.length > 0) {
-    var top = stack.shift();
-    m = TRACE_RE.exec(top);
+    var top = stack.shift()
+    m = TRACE_RE.exec(top)
     if (m != null) {
-      break;
+      break
     }
   }
-  var url;
+  var url
   if (m != null) {
     // Remove line number and column number
     // No need to check, can't be wrong at this point
-    var url = URL_RE.exec(m[1])[1];
+    var url = URL_RE.exec(m[1])[1]
   }
   // Set
   loaderPath = url
   // Set loaderDir
-  loaderDir = dirname(url || cwd);
+  loaderDir = dirname(url || cwd)
   // This happens with inline worker.
   // When entrance script's location.href is a blob url,
   // cwd will not be available.
   // Fall back to loaderDir.
   if (cwd === '') {
-    cwd = loaderDir;
+    cwd = loaderDir
   }
 }
 else {
@@ -348,18 +348,18 @@ else {
  * ref: tests/research/load-js-css/test.html
  */
 if (isWebWorker) {
-  function requestFromWebWorker(url, callback, charset) {
+  function requestFromWebWorker(url, callback, charset, crossorigin) {
     // Load with importScripts
-    var error;
+    var error
     try {
-      importScripts(url);
+      importScripts(url)
     } catch (e) {
-      error = e;
+      error = e
     }
-    callback(error);
+    callback(error)
   }
   // For Developers
-  seajs.request = requestFromWebWorker;
+  seajs.request = requestFromWebWorker
 }
 else {
   var doc = document
@@ -368,14 +368,15 @@ else {
 
   var currentlyAddingScript
 
-  function request(url, callback, charset) {
+  function request(url, callback, charset, crossorigin) {
     var node = doc.createElement("script")
-//	console.trace('request')
+
     if (charset) {
-      var cs = isFunction(charset) ? charset(url) : charset
-      if (cs) {
-        node.charset = cs
-      }
+      node.charset = charset
+    }
+
+    if (!isUndefined(crossorigin)) {
+      node.setAttribute("crossorigin", crossorigin)
     }
 
     addOnload(node, callback, url)
@@ -398,7 +399,7 @@ else {
 
   function addOnload(node, callback, url) {
     var supportOnload = "onload" in node
-//	console.trace('onload');
+
     if (supportOnload) {
       node.onload = onload
       node.onerror = function() {
@@ -434,6 +435,7 @@ else {
   seajs.request = request
 
 }
+
 var interactiveScript
 
 function getCurrentScript() {
@@ -464,182 +466,26 @@ function getCurrentScript() {
 /**
  * util-deps.js - The parser for dependencies
  * ref: tests/research/parse-dependencies/test.html
- * ref: https://github.com/seajs/searequire
+ * ref: https://github.com/seajs/crequire
  */
 
-function parseDependencies(s) {
-  if(s.indexOf('require') == -1) {
-    return []
-  }
-  var index = 0, peek, length = s.length, isReg = 1, modName = 0, parentheseState = 0, parentheseStack = [], res = []
-  while(index < length) {
-    readch()
-    if(isBlank()) {
-    }
-    else if(isQuote()) {
-      dealQuote()
-      isReg = 1
-    }
-    else if(peek == '/') {
-      readch()
-      if(peek == '/') {
-        index = s.indexOf('\n', index)
-        if(index == -1) {
-          index = s.length
+var REQUIRE_RE = /"(?:\\"|[^"])*"|'(?:\\'|[^'])*'|\/\*[\S\s]*?\*\/|\/(?:\\\/|[^\/\r\n])+\/(?=[^\/])|\/\/.*|\.\s*require|(?:^|[^$])\brequire\s*\(\s*(["'])(.+?)\1\s*\)/g
+var SLASH_RE = /\\\\/g
+
+function parseDependencies(code) {
+  var ret = []
+
+  code.replace(SLASH_RE, "")
+      .replace(REQUIRE_RE, function(m, m1, m2) {
+        if (m2) {
+          ret.push(m2)
         }
-      }
-      else if(peek == '*') {
-        index = s.indexOf('*/', index)
-        if(index == -1) {
-          index = length
-        }
-        else {
-          index += 2
-        }
-      }
-      else if(isReg) {
-        dealReg()
-        isReg = 0
-      }
-      else {
-        index--
-        isReg = 1
-      }
-    }
-    else if(isWord()) {
-      dealWord()
-    }
-    else if(isNumber()) {
-      dealNumber()
-    }
-    else if(peek == '(') {
-      parentheseStack.push(parentheseState)
-      isReg = 1
-    }
-    else if(peek == ')') {
-      isReg = parentheseStack.pop()
-    }
-    else {
-      isReg = peek != ']'
-      modName = 0
-    }
-  }
-  return res
-  function readch() {
-    peek = s.charAt(index++)
-  }
-  function isBlank() {
-    return /\s/.test(peek)
-  }
-  function isQuote() {
-    return peek == '"' || peek == "'"
-  }
-  function dealQuote() {
-    var start = index
-    var c = peek
-    var end = s.indexOf(c, start)
-    if(end == -1) {
-      index = length
-    }
-    else if(s.charAt(end - 1) != '\\') {
-      index = end + 1
-    }
-    else {
-      while(index < length) {
-        readch()
-        if(peek == '\\') {
-          index++
-        }
-        else if(peek == c) {
-          break
-        }
-      }
-    }
-    if(modName) {
-      res.push(s.slice(start, index - 1))
-      modName = 0
-    }
-  }
-  function dealReg() {
-    index--
-    while(index < length) {
-      readch()
-      if(peek == '\\') {
-        index++
-      }
-      else if(peek == '/') {
-        break
-      }
-      else if(peek == '[') {
-        while(index < length) {
-          readch()
-          if(peek == '\\') {
-            index++
-          }
-          else if(peek == ']') {
-            break
-          }
-        }
-      }
-    }
-  }
-  function isWord() {
-    return /[a-z_$]/i.test(peek)
-  }
-  function dealWord() {
-    var s2 = s.slice(index - 1)
-    var r = /^[\w$]+/.exec(s2)[0]
-    parentheseState = {
-      'if': 1,
-      'for': 1,
-      'while': 1,
-      'with': 1
-    }[r]
-    isReg = {
-      'break': 1,
-      'case': 1,
-      'continue': 1,
-      'debugger': 1,
-      'delete': 1,
-      'do': 1,
-      'else': 1,
-      'false': 1,
-      'if': 1,
-      'in': 1,
-      'instanceof': 1,
-      'return': 1,
-      'typeof': 1,
-      'void': 1
-    }[r]
-    modName = /^require\s*\(\s*(['"]).+?\1\s*\)/.test(s2)
-    if(modName) {
-      r = /^require\s*\(\s*['"]/.exec(s2)[0]
-      index += r.length - 2
-    }
-    else {
-      index += /^[\w$]+(?:\s*\.\s*[\w$]+)*/.exec(s2)[0].length - 1
-    }
-  }
-  function isNumber() {
-    return /\d/.test(peek)
-      || peek == '.' && /\d/.test(s.charAt(index))
-  }
-  function dealNumber() {
-    var s2 = s.slice(index - 1)
-    var r
-    if(peek == '.') {
-      r = /^\.\d+(?:E[+-]?\d*)?\s*/i.exec(s2)[0]
-    }
-    else if(/^0x[\da-f]*/i.test(s2)) {
-      r = /^0x[\da-f]*\s*/i.exec(s2)[0]
-    }
-    else {
-      r = /^\d+\.?\d*(?:E[+-]?\d*)?\s*/i.exec(s2)[0]
-    }
-    index += r.length - 1
-    isReg = 0
-  }
+      })
+
+  return ret
 }
+
+
 /**
  * module.js - The core of module loader
  */
@@ -822,7 +668,7 @@ Module.prototype.exec = function () {
   function require(id) {
     var m = mod.deps[id] || Module.get(require.resolve(id))
     if (m.status == STATUS.ERROR) {
-      throw new Error('module was broken: ' + m.uri);
+      throw new Error('module was broken: ' + m.uri)
     }
     return m.exec()
   }
@@ -838,9 +684,9 @@ Module.prototype.exec = function () {
 
   // Exec factory
   var factory = mod.factory
-  
+
   var exports = isFunction(factory) ?
-    factory(require, mod.exports = {}, mod) :
+    factory.call(mod.exports = {}, require, mod.exports, mod) :
     factory
 
   if (exports === undefined) {
@@ -890,7 +736,8 @@ Module.prototype.fetch = function(requestCache) {
     uri: uri,
     requestUri: requestUri,
     onRequest: onRequest,
-    charset: isFunction(data.charset) ? data.charset(requestUri) || 'utf-8' : data.charset
+    charset: isFunction(data.charset) ? data.charset(requestUri) : data.charset,
+    crossorigin: isFunction(data.crossorigin) ? data.crossorigin(requestUri) : data.crossorigin
   })
 
   if (!emitData.requested) {
@@ -900,7 +747,7 @@ Module.prototype.fetch = function(requestCache) {
   }
 
   function sendRequest() {
-    seajs.request(emitData.requestUri, emitData.onRequest, emitData.charset)
+    seajs.request(emitData.requestUri, emitData.onRequest, emitData.charset, emitData.crossorigin)
   }
 
   function onRequest(error) {
@@ -1086,6 +933,11 @@ data.cwd = cwd
 
 // The charset for requesting files
 data.charset = "utf-8"
+
+// @Retention(RetentionPolicy.SOURCE)
+// The CORS options, Don't set CORS on default.
+//
+//data.crossorigin = undefined
 
 // data.alias - An object containing shorthands of module id
 // data.paths - An object containing path shorthands in module id

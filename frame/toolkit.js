@@ -1,46 +1,11 @@
 /*
  * @author: leiguangyao;
- * @date: 20160523--20191115;
+ * @date: 20160523--20191119;
  */
 ;(function(doc){ //20180712
 	'use strict';
-	/**
-	 * @description 把类的成员，或属性设置为是否可枚举，只读。
-	 * @param  {Object} target         目标对像
-	 * @param  {String} keys           属性名，或函数名
-	 * @param  {[type]} methods        属性值，或函数体，无用null
-	 * @param  {Boolean} enumerable    能否用for-in枚举，默认true。
-	 * @param  {Boolean} writable      能否修改属性，默认true。
-	 * @param  {Boolean} configurable  是否能通过delete删除属性，默认true。
-	 */
-	var setProto = function (){
-		return (doc.createEvent === void 0) ? function(target, keys, methods){
-			target[keys] = methods;
-			return target;
-		} : function (target, keys, methods, enumerable, writable, configurable){
-			var obj;
-			if(!methods||!(methods.get||methods.set)){
-				obj = {value: methods};
-				obj.writable = writable === false ? false : true;
-			} else obj = methods;
-			obj.enumerable = enumerable === false ? false : true;
-			obj.configurable = configurable === false ? false : true;
-			Object.defineProperty(target, keys, obj);
-			return target;
-		};
-	}();
 	var nativePro = {};
-	nativePro.addProto = setProto;
-	nativePro.addForin = function(target, methods, enumerable, writable, configurable){
-		for(var keys in methods) this.addProto(target, keys, methods[keys], enumerable, writable, configurable);
-		return target;
-	};
-	nativePro.getSet = function(target, keys, methods, enumerable, configurable){
-		if(typeof(methods)=="function")
-			methods = methods.length > 0 ? {set: methods} : {get: methods};
-		this.addProto(target, keys, methods, enumerable, 'getset', configurable);
-		return target;
-	};
+	
 	nativePro.inObject = function(target, obj, key){
 		if(!(obj&&obj.constructor.name=='Object') || target==void 0) return false;
 		var tar = target[key] || target, o, k;
@@ -63,7 +28,7 @@
 		}
 		return false;
 	};
-	nativePro.addForin(Object, nativePro, false, true, false);
+	Object.addProto(Object, nativePro, false, true, false);
 	nativePro = {};
 	nativePro.inArray = function(obj, key) {
 		var len = this.length, i, o;
@@ -103,12 +68,12 @@
 		} while(++i < len);
 		item = null;
 	};
-	Object.addForin(Array.prototype, nativePro, false);
+	Object.addProto(Array.prototype, nativePro, false);
 	nativePro = {};
 	/*保留几位小数*/
 	nativePro.toFixNum = function(num) { return parseFloat(this.toFixed(num)); };
-	Object.addForin(Number.prototype, nativePro, false);
-	setProto = nativePro = null;
+	Object.addProto(Number.prototype, nativePro, false);
+	nativePro = null;
 }(document));
 (function(win, doc) { //TODO //20190411
 	'use strict';
@@ -157,7 +122,7 @@
 		Object.prototype.constructor.name = 'Object';
 	}
 	var eve = {_addEventListener: evtPro.addEventListener, _removeEventListener: evtPro.removeEventListener};
-	Object.addForin(evtPro, eve, false);
+	Object.addProto(evtPro, eve, false);
 	evtPro.addEventListener = function(a, b, c) {
 		if (c == undefined) c = false;
 		this._addEventListener(a, b, c);
@@ -183,224 +148,7 @@
 	};
 	evtPro = null;
 }(window, document));
-(function(globals, doc) { //20180807 TODO
-	'use strict';
-	var initTime = Date.now(), mapping = {}, cache = {}, plugins = [],
-		regJS = /\.js$/, regCSS = /\.css$/, curReq = null, initFn = [];
-	var exp = {}, config = {}, wait = {}, alias, errorFn = {}, firstInit = true;
-	
-	function isArr(arr){return (arr instanceof Array) ? true : false;}
-	function sta(q){ return (typeof(q)=="string") ? [q] : (isArr(q) ? q : []); }
-	function isFn(fn){return (fn instanceof Function) ? true : false;}
-	var isIE8 = (function(){ return doc.createEvent === void 0 ? true : false;}());
-	exp.initModule = function(main, exFn) {
-		var kit = exp.kitRequire('main/kit');
-		if(isFn(main)||kit.type(main)=="object"){
-			exFn = main; main = null;
-		}else if(arguments.length==1) return configEvent(main, '', getID());
-		var id = getID(), rely = parseRely(main, exFn, id);
-		if(isFn(exFn)||typeof(exFn)=="object"){
-			initFn.push({mod: create(id, rely), fn: exFn});
-		}
-		if( isReady() ) globals.setTimeout( execute );
-	};
-	exp.define = function(id /*,rely, fn*/) {
-		var fn, rely;
-		if(config.complete) id = toVars(id);
-		if(arguments.length > 2){
-			rely = arguments[1];
-			fn = arguments[2];
-		} else fn = arguments[1];
-		if(isFn(fn) && id){
-			mapping[id] = {mod: create(id, parseRely(rely, fn, id)), fn: fn};
-		} else if(id) exp.initModule(id);
-	};
-	exp.kitRequire = function (id) {
-		id = toVars(id);
-		if(cache[id]) return cache[id];
-		var M = mapping[id], c;
-		if(!M){
-			if(!alias[id]) console.warn(id+'：Module is not define!');
-			return;
-		}
-		c = M.mod.exports = {};
-		cache[id] = M.fn.call(c, exp.kitRequire, c, M.mod) || M.mod.exports;
-		delete mapping[id];
-		return cache[id];
-	};
-	Object.addForin(globals, exp, false);
-	function Module(id, rely){
-		this.id = id;
-		this.rely = rely || '';
-		if(config.complete) this.uri = alias[id] || '';
-	}
-	function getID(){
-		for(var i = 0,id='ID'; i < 6; i++) id += Math.floor(Math.random() * 10);
-		return id;
-	}
-	function create(id, rely){ return new Module(id, rely); }
-	function parseRely(urls, fn, id){
-		if(!config.complete) return configEvent(urls, fn, id);
-		urls = sta(urls);
-//		fn = fn.toString().replace(/\/\/.+|\s|"|'/g,'').replace(/\/\*.+?\*\//g,'')
-		fn = fn.toString().replace(/(\/\*[\s\S]+?\*\/)|(\/\/.+)|['"`\s]/g, '')
-		.replace(/{(\w+)}/g, function(o, v){return config.vars[v]||o});
-		var reg = (fn.indexOf('function')==0) ? (/.+?\((.+?)[,)]/).exec(fn) : (/.+?(.+?)\){0,1}=>/).exec(fn);
-		if(!reg||reg[1].indexOf(')')==0) return urls;
-		fn.replace(new RegExp(reg[1]+'\\((.+?)\\)','g'), function(a, w){urls.push(w)});
-		preload(urls);
-		return urls;
-	}
-	//配置
-	Object.addProto(exp.initModule, 'config', function (obj){
-		config = typeof(obj)=="object" ? obj : {};
-		var path = config.paths, p, a, vars = config.vars;
-		alias = config.alias || {};
-		config.alias = {};
-		if(vars){
-			for(a in alias){ config.alias[toVars(a)] = alias[a];}
-			alias = config.alias;
-		} else config.vars = {};
-		if(path){
-			for(p in path){
-				var reg = new RegExp('^'+p);
-				for(a in alias) alias[a] = alias[a].replace(reg, path[p]);
-			}
-		} else config.paths = {};
-		config.complete = true;
-		forWait();
-	}, false);
-	Object.addProto(exp.initModule, 'addConfig', function (obj){
-		obj = typeof(obj)=="object" ? obj : {};
-		var kit = exp.kitRequire('main/kit');
-		obj = kit.extend(obj,config);
-		exp.initModule.config(obj);
-	}, false);
-	function configEvent(urls, fn, id){ wait[id] = {r:urls, fn:fn}; }
-	function forWait(){
-		var i , len = initFn.length, o, id, r;
-		for (i = 0; i < len; i++) {
-			id = initFn[i].mod.id;
-			if(o = wait[id]){
-				r = parseRely(o.r, o.fn);
-				initFn[i].mod = create(id, r);
-				delete wait[id];
-			}
-		}
-		for (i in wait){
-			o = wait[i];
-			r = parseRely(o.r, o.fn);
-			if(len = mapping[i]){
-				delete mapping[i];
-				id = toVars(i);
-				mapping[id] = {mod: create(id, r), fn: len.fn};
-			}
-		}
-		wait = {};
-		if( isReady() ) globals.setTimeout( execute );
-	}
-	function toVars(str){
-		if(typeof(str)!="string") return str;
-		return str.replace(/{(\w+)}/g, function(o, v){return config.vars[v]||o});
-	}
-	//预加载
-	var preloadObj = {}, head = doc.querySelector('head');
-	function preload(use, isLink, fn, erFn){
-		use = sta(use);
-		for (var i = 0; i < use.length; i++) {
-			if(!regCSS.test(use[i])) {
-				if(preloadObj[use[i]]) continue;
-				if(isLink){
-					preloadObj[use[i]] = use[i];
-					plugins.push(use[i]);
-					errorFn[use[i]] = erFn;
-				} else if(alias[use[i]]) {
-					preloadObj[use[i]] = alias[use[i]];
-					plugins.push(alias[use[i]]);
-				}
-			} else {
-				var rel = doc.getElementsByTagName('link');
-				for (var s = 0; s < rel.length; s++) if(rel[s].href.indexOf(use[i]) != -1) break;
-				if(s != rel.length) continue;
-				var es = doc.createElement('link');
-				es.rel = 'stylesheet';
-				es.type = 'text/css';
-				es.href = use[i];
-				head.appendChild(es);
-			}
-		}
-		if( isFn(fn) ) initFn.push({mod: create(getID()), fn: fn});
-		if(curReq==null && plugins.length==0 && isLink) execute();
-		if(curReq != null || plugins.length == 0) return;
-		request();
-	}
-	function request() {
-		var es = doc.createElement('script');
-		curReq = plugins.shift();
-		es.id = curReq;
-		if(!regJS.test(curReq)) curReq += '.js';
-		es.type = 'text/javascript';
-		es.src = curReq;
-		if(isIE8) es.onreadystatechange = onload;
-		else es.onload = onload;
-		es.onerror = errors;
-		head.appendChild(es);
-	}
-	function onload(e) {
-		if(isIE8){
-			var r = this.readyState;
-			if(r === 'loaded' || r === 'complete') {
-			} else return
-		}
-		this.onreadystatechange = this.onerror = this.onload = null;
-		head.removeChild(this);
-		loading();
-	}
-	function loading() {
-		if(plugins.length > 0){
-			request();
-		} else {
-			curReq = null;
-			if( isReady() ) globals.setTimeout( execute );
-		}
-	}
-	function errors(e) {var f = errorFn[this.id]; if(isFn(f)) {f();} loading();}
-	
-	function isReady(){
-		if ( doc.readyState === "complete" || (doc.readyState !== "loading" && !doc.documentElement.doScroll) ) {
-			return curReq == null ? true : false;
-		} else {
-			doc.addEventListener( "DOMContentLoaded", completed );
-			globals.addEventListener( "load", completed );
-			return false;
-		}
-	}
-	function execute() {
-		if(!config.complete) return;
-		while(initFn.length > 0){
-			if(curReq != null) return;
-			var M = initFn.shift(), entry, c = M.mod.exports = {};
-			if(!isFn(M.fn)) entry =  M.fn;
-			else entry = M.fn.call(c, exp.kitRequire, c, M.mod) || M.mod.exports;
-			if(isFn(entry.init)) entry.init();
-			if(isFn(entry.events)) entry.events();
-		}
-		if(firstInit){
-			firstInit = false;
-			console.log('initTime: ', Date.now() - initTime);
-		}
-		errorFn = {};
-	}
-	function completed() {
-		doc.removeEventListener( "DOMContentLoaded", completed );
-		globals.removeEventListener( "load", completed );
-		if( isReady() ) globals.setTimeout( execute );
-	}
-	Object.addProto(Module.prototype, 'loader', function (src, fn, erFn){
-		preload(src, true, fn, erFn);
-	}, false);
-	define('loader', function(){ return Module.prototype.loader; });
-}(window, document));
+
 /******************************************************************************/
 
 define('main/kit', function(require, exports, module)
@@ -968,7 +716,7 @@ define('main/kit', function(require, exports, module)
 	 */
 	function _qs(selector, el) // TODO
 	{
-		Object.addProto(this, 'length', 0, false, true, false);
+		Object.setProto(this, 'length', 0, false, true, false);
 		this.init(selector, el);
 
 /******************************** 原型链 **********************************/
@@ -1659,7 +1407,7 @@ define('main/kit', function(require, exports, module)
 			var timer = this.timer;
 			if(!timer){
 				timer = kit.timer();
-				Object.addProto(this, 'timer', timer, false);
+				Object.setProto(this, 'timer', timer, false);
 			}
 			options.clip = valueParts(options, this);
 			timer.setParam( options );
@@ -1686,8 +1434,8 @@ define('main/kit', function(require, exports, module)
 	_qsObj.splice = _utilArr.splice;
 	_qsObj.init = _qsInit;
 	_qsObj.isNull = function() { return this.length <= 0 ? true : false; };
-	Object.addForin(pro, _qsObj, false, true, false);
-	Object.addProto(ToolKit, 'constructor', _qs, false);
+	Object.addProto(pro, _qsObj, false, true, false);
+	Object.setProto(ToolKit, 'constructor', _qs, false);
 	_qsObj = pro = null;
 	return ToolKit;
 });
@@ -1719,196 +1467,16 @@ define('main/location', function(require, exports, module){
 	exports.root = function(){ return root; };
 	exports.isApp = function(){ return isApp; };
 });
-(function(win){
-	var lt = kitRequire('main/location'), r;
+/* (function(win){
+	var lt = $module.require('main/location'), r;
 	lt.projectName('toolkit'); //必须,H5根目录
 	r = lt.projectName()=='/' ? lt.origin() : lt.root();
-	kitRequire('loader')(r + 'globalConfig.js', '', function(){initModule.config({});});
-	lt = kitRequire('main/kit').screenFix();
+	$module.require('loader')(r + 'globalConfig.js', '', function(){initModule.config({});});
+	lt = $module.require('main/kit').screenFix();
 	r = false;
 	if(lt.os != 'pc'){
 		if(win.innerWidth >=576) r = 56;
 	} else r = 50;
 	lt.offFix(r);
 	lt('#IDkit').detach().dispose(false);
-}(window));
-
-/*
- * @author: kasumi;
- * @date: 20170814--20180308;
- */
-(function(){
-	var lt = require('main/location'), config = {}, root;
-	root = lt.projectName() == '/' ? lt.origin() : lt.root();
-	config.paths = {
-		libs: 		root + 'libs',
-		jq:			root + 'libs/JQ',
-		plugins:	root + 'libs/plugins',
-		vue:		root + 'libs/vue',
-		js:			root + 'js'
-	};
-	config.alias = {
-		'{utils}':		'libs/utils.js',
-		vue:            'vue/vue.min.js',
-		jquery1:        'jq/jquery-1.12.4.min.js',
-		jquery2:        'jq/jquery-2.2.4.min.js',
-		jquery3:        'jq/jquery-3.3.1.min.js',
-		'jq/qrlogo':	'jq/jquery.qrcode.logo.min.js',
-		'jq/qrcode':	'jq/jquery.qrcode.js',
-		qrcode:			'jq/qrcode.js',
-		baiduMap:       'js/baiduMap.js',
-		jweixin:        'js/jweixin-1.2.0.js',
-		slip:           'js/slip.min.js',
-		AES:            'plugins/aes.js',    //AES加密
-		scrollPage:     'plugins/scrollPage.js',
-		scrollMobile:   'plugins/scrollMobile.js',
-		stage:          'plugins/stage.js',
-		hitTest:        'plugins/hitTest.js',
-		observer:       'plugins/observer.js',
-		getDate:        'plugins/getDate.js'
-	};
-	config.vars = {
-		kit:	'main/kit',
-		utils:	'main/utils'
-	};
-	initModule.config(config);
-}());
-define('main/globalVar', function(require, exports, module){
-	return exports;
-});
-(function(globals){
-	var k = require('main/kit')('html'), isAutoLoadJs = false, isRelativePath = true;
-	switch (k.getAttr('auto')){
-		case '0': case '': case 'false': isAutoLoadJs = false; break;
-		case '1': case 'true': isAutoLoadJs = true; break;
-		default: break;
-	}
-	if(isAutoLoadJs){
-		var lt = require('main/location'), path, root = lt.root(),
-			page = lt.pageName(1) || 'index';
-		path = (isRelativePath ? './js/' : root + 'js/') + page;
-		require('loader')(path);
-		k = k.dispose(false);
-	}
-}(this));
-
-//TODO
-/**
- * 用XHR模块化加载脚本
- * XMLHttpRequest
- */
-;void(function(global) {
-	console.time('initTime');
-	var mapping = {}, cache = {}, plugins = [],
-		regJS = /\.js$/, curReq = null, m,
-		http = new XMLHttpRequest(), initFn = [];
-	var firstInit = true;
-	global.initModule = function(idFn) {
-		if(idFn instanceof Function) initFn.push(idFn);
-		else if(typeof(idFn)=="string") m = idFn;
-//		else console.error('initModule：失败，入参不对!');
-		if( isReady() ) window.setTimeout( execute );
-	};
-	global.define = function(id, fn) {
-		if(typeof(id)=="string" && fn instanceof Function)
-			mapping[id] = fn;
-		else console.warn('function define is error!');
-	};
-	global.require = function(id) {
-//		console.trace(id);  //追踪
-		if(cache[id]) return cache[id];
-		var arr = Array.prototype.slice.call(arguments), exports;
-		arr[0] = {}; exports = mapping[id];
-		if(exports) return cache[id] = exports.apply(arr[0], arr);
-		console.warn(id+'：Module is not define!');
-	};
-	function globalConfig(urls) {
-		if(!(urls && urls.constructor.name=='Object')) console.error('config：配置的入参不是对像！');
-		for(var keys in urls){ plugins.push( {id: keys, src: urls[keys]} ); }
-		if(curReq != null || plugins.length == 0) return;
-		request();
-	};
-	
-	function request() {
-		curReq = plugins.shift();
-		if(!regJS.test(curReq.src)) curReq.src += '.js';
-		http.onreadystatechange = result;
-		http.onerror = errors;
-		http.open('get', curReq.src, true);
-		http.send(null);
-	}
-	function result(e) {
-		if(this.readyState != 4) return;
-		if(this.status == 200||this.status==0){
-//			console.log(this.responseText);
-			eval(this.responseText);
-		}
-		loading();
-	}
-	function loading() {
-		if(plugins.length > 0){
-			request();
-		} else {
-			curReq = null;
-			if( isReady() ) window.setTimeout( execute );
-		}
-	}
-	function errors(e) {console.error('请求错误:',this.status,this.statusText);loading();}
-	
-	function isReady(){
-		if ( document.readyState === "complete" || (document.readyState !== "loading" && !document.documentElement.doScroll) ) {
-			return curReq == null ? true : false;
-		} else {
-			document.addEventListener( "DOMContentLoaded", completed );
-			window.addEventListener( "load", completed );
-			return false;
-		}
-	}
-	function execute() {
-		while(initFn.length > 0){
-			if(curReq != null) return;
-			var fn = initFn.shift();
-			var entry = fn.call(fn);
-			if(entry){
-				if(entry.init instanceof Function) entry.init();
-				if(entry.events instanceof Function) entry.events();
-			}
-		}
-		if(curReq != null) return;
-		if( m&&(m = require(m)) ){
-			if(m.init instanceof Function) m.init();
-			if(m.events instanceof Function) m.events();
-			m = null;
-		}
-		if(firstInit){
-			firstInit = false;
-			console.timeEnd('initTime');
-		}
-	}
-	function completed() {
-		document.removeEventListener( "DOMContentLoaded", completed );
-		window.removeEventListener( "load", completed );
-		if( isReady() ) window.setTimeout( execute );
-	}
-	define('preloadScript', function(exports){
-		var preloadObj = {};
-		return function (src, fn){
-			var obj = {};
-			if(typeof(src)=="string") obj[src] = src;
-			else if(src instanceof Array){
-				for (var i = 0; i < src.length; i++)
-					obj[src[i]] = src[i];
-			}else if(src && src.constructor.name=='Object') obj = src;
-			else return;
-			var k, libs = {};
-			for(k in obj){
-				if(preloadObj[k] == obj[k] || preloadObj[obj[k]] == obj[k]){
-					console.log(k,'已经加载过了！'); continue;
-				}
-				libs[k] = preloadObj[k] = obj[k];
-			}
-			globalConfig(libs);
-			global.initModule(fn);
-		};
-	});
-}(this));
+}(window)); */

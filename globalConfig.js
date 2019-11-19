@@ -6,19 +6,18 @@ define('main/globalVar', function(require, exports, module){
 	return exports;
 });
 (function(){
-	var lt = kitRequire('main/location'), config = {}, root;
+	var lt = $module.require('main/location'), config = {}, root;
 	root = lt.projectName() == '/' ? lt.origin() : lt.root();
-	config.paths = {
+	config.paths = { //路径前缀
 		libs: 		root + 'libs',
 		jq:			root + 'libs/JQ',
 		plugins:	root + 'libs/plugins',
 		vue:		root + 'libs/vue',
 		js:			root + 'js'
 	};
-	config.alias = {
+	config.alias = { //别名
 		'{utils}':		'libs/utils.js',
 		vue:            'vue/vue.min.js',
-		bingoData:		'vue/bingoData.js',
 		renderData: 	'vue/renderData.js',
 		jquery1:        'jq/jquery-1.12.4.min.js',
 		jquery2:        'jq/jquery-2.2.4.min.js',
@@ -35,30 +34,31 @@ define('main/globalVar', function(require, exports, module){
 		scrollMobile:   'plugins/scrollMobile.js',
 		stage:          'plugins/stage.js',
 		hitTest:        'plugins/hitTest.js',
+		observe:		'plugins/observe_es6.js',
 		observer_es5:   'plugins/observer_es5.js',
 		getDate:        'plugins/getDate.js',
 		http:			'plugins/httpRequest.js',
 		broadcast:		'plugins/broadcast.js',
 		banner:			'banner.js'
 	};
-	config.vars = {
+	config.vars = { //键名
 		kit:	'main/kit',
 		utils:	'main/utils'
 	};
-	initModule.config(config, 'babel');
+	$module.config(config, 'babel');
 }());
 (function(globals){
-	var k = kitRequire('main/kit')('html'), isAutoLoadJs = false, isRelativePath = true;
+	var k = $module.require('main/kit')('html'), isAutoLoadJs = false, isRelativePath = true;
 	switch (k.getAttr('auto')){
 		case '0': case '': case 'false': isAutoLoadJs = false; break;
 		case '1': case 'true': isAutoLoadJs = true; break;
 		default: break;
 	}
 	if(isAutoLoadJs){
-		var lt = kitRequire('main/location'), path, root = lt.root(),
+		var lt = $module.require('main/location'), path, root = lt.root(),
 			page = lt.pageName(1) || 'index';
 		path = (isRelativePath ? './js/' : root + 'js/') + page;
-		kitRequire('loader')(path);
+		$module.require('loader')(path);
 		k = k.dispose(false);
 	}
 }(this));

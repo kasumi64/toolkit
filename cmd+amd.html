@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html class="html">
+<head>
+	<meta http-equiv="content-type" content="text/html; charset=utf-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0, user-scalable=no"/>
+	<meta http-equiv="cache-control" content="no-store" />
+	<meta http-equiv="Pragma" content="no-cache" />
+	<meta http-equiv="expires" content="0" />
+	<title>CMD+AMD模块加载</title>
+	
+	<style>
+		.html{font-size: 16px;margin: 8px;}
+		/* .selectbox select:-internal-list-box option:checked {
+			color: red;
+		} */
+		.sel {
+			width: 150px;
+			background-color: transparent;
+			border: 2px solid lightblue;
+			border-radius: 4px;
+			overflow: hidden;
+			padding: 5px 3px;
+		}
+		.sel:focus{-webkit-outline-radius: 4px;}
+	</style>
+	
+	<!-- <script src="frame/sea-debug.js"></script> -->
+	<!-- <script src="frame/RequireJS.mini.js"></script> -->
+	<script src="frame/CMD.js" ></script>
+</head>
+<body>
+	<p style="text-align: center;">ABC</p>
+	<div class="selectbox">
+		<select class="sel" autocomplete="off">
+			<option value="看书">看书</option>
+			<option value="旅游">旅游</option>
+			<option value="运动">运动</option>
+			<option value="购物">购物</option>
+		</select>
+		<!-- <br /> -->
+		<label>Choose datalist:</label>
+		<input list="browsers" name="myBrowser" /></label>
+		<datalist id="browsers">
+			<option value="Chrome">看书</option>
+			<option value="Firefox">旅游</option>
+			<option value="Internet Explorer">运动</option>
+			<option value="Opera">购物</option>
+			<option value="Safari">IOS</option>
+		</datalist>
+	</div>
+
+</body>
+<script type="text/javascript">
+	$module.init(['libs/libsCfg'], function (require, exports, module) {
+		console.log('main')
+	});
+	
+	define('p', function(){
+		console.log('define')
+		return {'def': '测试'}
+	});
+</script>
+
+</html>

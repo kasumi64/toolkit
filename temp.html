@@ -56,7 +56,7 @@ initModule(['jquery3','http'], function(req, exports, module)
 //	kit.screenFix(50);
 
 	var http = req('fetch');
-	var obs = req('bingoData')();
+	var obs = req('observe')();
 	
 	console.log(obs)
 	win.addEventListener('keydown',function(e){

@@ -1,6 +1,6 @@
 /*
  * @author: leiguangyao;
- * @date: 20160523--20190411;
+ * @date: 20160523--20191115;
  */
 ;(function(doc){ //20180712
 	'use strict';
@@ -691,15 +691,13 @@ define('main/kit', function(require, exports, module)
 	 * template({{rep:'我被替换了'}},tl.innerHTML);
 	 */
 	ToolKit.template = function(jsons, dom, origin, getArr){
-		if(!(jsons instanceof Array)) jsons = [jsons];
-		var temp = [], i, len = jsons.length, obj;
+		// if(!(jsons instanceof Array)) jsons = [jsons];
+		var temp = [], obj;
 		dom = dom.replace(_regSpace, '');
-		for (i = 0; i < len; i++) {
-			obj = jsons[i];
+		for (var k in jsons) {
+			obj = jsons[k];
 			if(!(obj instanceof Array)){
-				obj['_i_'] = i;
 				temp.push(dom.replace(_regTemplate, replace));
-				delete obj['_i_'];
 			} else temp.push(kit.template(obj, dom, origin, getArr));
 		}
 		function replace(rep, val){

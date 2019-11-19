@@ -1,19 +1,19 @@
 /*
- * 观察者模式
+ * 观察者模式observe
  * @author: leiguangyao;
  * @date: 20190611-20190621;
  */
-;define('observe', function (require, exports, module)
-{
-( function( global, factory ) {
+;( function( global, factory ) {
 	if ( typeof module === "object" && typeof module.exports === "object" ) {
 		module.exports = factory();
+	} else if ( typeof define === "function" ) {
+		define('bingo', factory);
 	} else if ( typeof global === 'object' ) {
 		global.$bingo = factory();
 	} else {
 		throw new Error( "plugin requires a Object." );
 	}
-}) ( typeof window !== "undefined" ? window : this, function(){
+}) ( window || this, function(){
 	"use strict";
 	
 	class BingoData { //observe
@@ -103,8 +103,6 @@
 		
 	};
 	return self => { return new BingoData(self); };
-});
-
 });
 
 /*
