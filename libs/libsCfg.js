@@ -5,30 +5,34 @@
 		// 路径配置
 		paths: {
 			P: './libs/plugins/',
-			'JQ': './libs/JQ/'
+			JQ: './libs/JQ/',
+			i18n: './language/'
 		},
 		// 别名配置
 		alias: {
 			kit: './frame/toolkit.js',
 			bingo: 'P/observe_es6.js',
 			jquery: 'JQ/jquery-3.3.1.js',
+			forbid: 'P/forbid.js',
 			initTag: './css/initTag.min.css',
+			i18n: 'i18n/i18n.js',
+			zh: 'i18n/zh.js',
+			en: 'i18n/en.js',
 			'{zhcn}': '被vars.locale替换'
 		},
 		// 变量配置
 		vars: {
 			'zhcn': 'locale'
 		},
+		// 预加载项
+		preload: ['initTag', 'kit', 'i18n'],
 		// 映射配置
 		map: [
-			['http://example.com/js/app/', 'http://localhost/js/app/']
+			[ /(.*?)(\.js)$/i , '$1-debug.js'],
+			[ /(.*?)(\.js)$/i , '$1-mini.js']
 		],
-		// 预加载项
-		preload: ['initTag', 'kit'],
 		// 调试模式
-		debug: false,
-		// 文件编码
-		charset: 'utf-8'
+		debug: false
 	};
 	$module.config(cfg);
 	return 'config';

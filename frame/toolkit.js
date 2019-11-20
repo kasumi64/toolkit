@@ -150,8 +150,17 @@
 }(window, document));
 
 /******************************************************************************/
-
-define('main/kit', function(require, exports, module)
+;( function( global, factory ) {
+	if ( typeof module === "object" && typeof module.exports === "object" ) {
+		module.exports = factory();
+	} else if ( typeof define === "function" ) {
+		define('kit', factory);
+	} else if ( typeof global === 'object' ) {
+		global.kit = factory();
+	} else {
+		throw new Error( "plugin requires a Object." );
+	}
+}) ( window || this, function(require, exports, module)
 {
 	'use strict';
 	var doc = document, win = window, kit = ToolKit, //TODO
@@ -1439,6 +1448,7 @@ define('main/kit', function(require, exports, module)
 	_qsObj = pro = null;
 	return ToolKit;
 });
+
 define('main/location', function(require, exports, module){
 	var path = window.location.pathname, origin = window.location.protocol+'//',
 		fileName, root, isApp = (origin == 'file://' ? true : false),

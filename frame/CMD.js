@@ -8,10 +8,10 @@
 	'use strict';
 	/**
 	 * @description 把类的成员，或属性设置为是否可枚举，只读。
-	 * @param  {Object} target         目标对像
-	 * @param  {String} keys           属性名，或函数名
-	 * @param  {[type]} methods        属性值，或函数体，无用null
-	 * @param  {Boolean} enumer    能否用for-in枚举，默认true。
+	 * @param  {Object} target      目标对像
+	 * @param  {String} keys        属性名，或函数名
+	 * @param  {[type]} methods     属性值，或函数体，无用null
+	 * @param  {Boolean} enumer     能否用for-in枚举，默认true。
 	 * @param  {Boolean} write      能否修改属性，默认true。
 	 * @param  {Boolean} configure  是否能通过delete删除属性，默认true。
 	 */
@@ -256,10 +256,7 @@
 		alias: {}, // 别名配置
 		vars: {}, // 变量配置
 		preload: [], // 预加载项
-		// 映射配置
-		map: [
-			['', '']
-		],
+		map: null, //映射配置[fn, arr[reg, str]]
 		debug: false, charset: 'utf-8'
 	};
 	exp.define = define;
@@ -308,6 +305,27 @@
 		},
 		require: require
 	};
+	
+	function parseCfgMap(uri) {
+	  var map = cfg.map;
+	  var ret = uri;
+	 
+	  if (map) {
+	    for (var i = 0, len = map.length; i < len; i++) {
+	      var rule = map[i]
+	 
+	      ret = isFunction(rule) ?
+	          (rule(uri) || uri) :
+	          uri.replace(rule[0], rule[1]);
+	 
+	      // Only apply the first matched rule
+	      if (ret !== uri) break;
+	    }
+	  }
+	 
+	  return ret;
+	}
+
 	Object.addProto(globals, exp, false);
 	Object.setProto(Modules.prototype, 'loader', function (src, fn, erFn){
 		preload(src, 'async', fn, erFn);

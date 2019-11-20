@@ -29,7 +29,8 @@
 	<script src="frame/CMD.js" ></script>
 </head>
 <body>
-	<p style="text-align: center;">ABC</p>
+	<p style="text-align: center;" i18n="com.title">ABC</p>
+	<input type="text" placeholder="com.title" />
 	<div class="selectbox">
 		<select class="sel" autocomplete="off">
 			<option value="看书">看书</option>
@@ -48,17 +49,28 @@
 			<option value="Safari">IOS</option>
 		</datalist>
 	</div>
-
+	<ul id="list">
+		
+	</ul>
+	<template id="listDom">
+		<li i18n="com.title">{asdf}</li>
+		<li>{99}</li>
+	</template>
 </body>
 <script type="text/javascript">
-	$module.init(['libs/libsCfg'], function (require, exports, module) {
-		console.log('main')
+	$module.init(['./libs/libsCfg'], function (require, exports, module) {
+		var i18n = require('i18n');
+		var listDom = document.getElementById('listDom').innerHTML;
+		var dom = i18n.translate();
+		console.log(i18n.language());
 	});
 	
 	define('p', function(){
 		console.log('define')
 		return {'def': '测试'}
 	});
+	
+	
 </script>
 
 </html>
