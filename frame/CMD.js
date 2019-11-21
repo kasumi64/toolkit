@@ -1,8 +1,8 @@
  /**
   * CMD + AMD，js模块化。
   * @author: leiguangyao;
-  * @date: 20180807~~20191119;
-  * @version: 3.0.2
+  * @date: 20180807~~20191121;
+  * @version: 3.0.3
   * */
 (function (globals, doc) {
 	'use strict';
@@ -286,15 +286,23 @@
 		config: function(obj){
 			if(getType(obj) != 'object') obj = {};
 			cfg = copy({}, config, obj);
+			cfg.map = isArr(obj.map) ? obj.map : null;
 			var paths = cfg.paths, k, p;
 			alias = {};
 			for(k in cfg.alias){alias[toVars(k)] = cfg.alias[k];}
 			cfg.alias = alias;
 			
-			for(p in paths){
-				var reg = new RegExp('^'+p);
-				for(k in alias) alias[k] = alias[k].replace(reg, paths[p]);
+			for(k in alias) {
+				for(p in paths){
+					var reg = new RegExp('^'+p);
+					var uri = alias[k].replace(reg, paths[p]);
+					if(alias[k] !== uri){
+						alias[k] = uri; break;
+					}
+				}
+				alias[k] = addBase(parseCfgMap(alias[k]));
 			}
+			
 			isCfged = true;
 			if(cfg.debug) console.log('配置信息', cfg);
 			return isCfged;
@@ -307,23 +315,27 @@
 	};
 	
 	function parseCfgMap(uri) {
-	  var map = cfg.map;
-	  var ret = uri;
-	 
-	  if (map) {
-	    for (var i = 0, len = map.length; i < len; i++) {
-	      var rule = map[i]
-	 
-	      ret = isFunction(rule) ?
-	          (rule(uri) || uri) :
-	          uri.replace(rule[0], rule[1]);
-	 
-	      // Only apply the first matched rule
-	      if (ret !== uri) break;
-	    }
-	  }
-	 
-	  return ret;
+		var map = cfg.map, ret = uri;
+		if (!map) return ret;
+		for (var i = 0, len = map.length; i < len; i++) {
+			var rule = map[i];
+			ret = isFn(rule) ? (rule(uri) || uri) : uri.replace(rule[0], rule[1]);
+			// Only apply the first matched rule
+			if (ret !== uri) break;
+		}
+		return ret;
+	}
+	function addBase(refUri) {
+		var base = cfg.base;
+		if(typeof(base)!="string") return refUri;
+		if (refUri.indexOf("//") === 0) {
+			return location.protocol + refUri;
+		}
+		if(/^\.\/|^\.\.\//.test(refUri)) return refUri;
+		
+		if( !(/\/$/.test(base)) ) base += '/';
+		var uri = refUri.replace(/^\/+/, '');
+		return base + uri;
 	}
 
 	Object.addProto(globals, exp, false);

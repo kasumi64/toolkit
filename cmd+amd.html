@@ -27,6 +27,7 @@
 	<!-- <script src="frame/sea-debug.js"></script> -->
 	<!-- <script src="frame/RequireJS.mini.js"></script> -->
 	<script src="frame/CMD.js" ></script>
+	<!-- <script src="./frame/CMD.js" ></script> -->
 </head>
 <body>
 	<p style="text-align: center;" i18n="com.title">ABC</p>
@@ -59,10 +60,7 @@
 </body>
 <script type="text/javascript">
 	$module.init(['./libs/libsCfg'], function (require, exports, module) {
-		var i18n = require('i18n');
-		var listDom = document.getElementById('listDom').innerHTML;
-		var dom = i18n.translate();
-		console.log(i18n.language());
+		
 	});
 	
 	define('p', function(){

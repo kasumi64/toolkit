@@ -1,3 +1,9 @@
+ /**
+  * 国际化语言
+  * @author: leiguangyao;
+  * @date: 20191120~~20191121;
+  * @version: 1.0.1
+  * */
 ;( function( global, factory ) {
 	if ( typeof module === "object" && typeof module.exports === "object" ) {
 		module.exports = factory();
@@ -57,7 +63,7 @@
 		}
 	}());
 	function getWords(){
-		return internationalization[i18n.language()];
+		return internationalization[i18n.language()]||internationalization['zh'];
 	};
 	function $t(str){ // i18n.$t('tips.btn');
 		var lang = getWords(), k;
@@ -67,9 +73,14 @@
 			lang = lang[k];
 			if (lang == void 0) return '';
 		}
+		if(typeof(lang)=="object") return JSON.parse( JSON.stringify(lang) ); 
 		return lang;
 	};
 	i18n.$t = $t;
+	i18n.addLanguage = function(lang, context){
+		internationalization[lang] = context;
+	};
+	//浏览器专用
 	i18n.translate = function(html, keys){
 		var outer, lang = getWords(), name = keys || 'i18n';
 		//获取需要翻译的容器及组件
@@ -93,6 +104,9 @@
 		}
 		return outer.innerHTML;
 	};
+	
+	
+	if(!document) delete i18n.translate;
 	
 	return i18n;
 });
