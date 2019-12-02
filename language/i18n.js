@@ -85,11 +85,12 @@
 		var outer, lang = getWords(), name = keys || 'i18n';
 		//获取需要翻译的容器及组件
 		if(/<[^<>]+>/.test(html)){
-			var outer = document.createElement('div');
+			var tag = 'div';
+			if(/<tr>|<td>|<thead>|<th>|<tbody>/.test(html)) tag = 'table';
+			var outer = document.createElement(tag);
 			outer.innerHTML = html;
 		} else outer = document;
-		var els = outer.querySelectorAll('[' + name + ']');
-		var i, el;
+		var i, el, els = outer.querySelectorAll('[' + name + ']');
 		for (i = 0; i < els.length; i++) {
 			el = els[i];
 			// var arr = /\{.+?\}/.exec(el.innerHTML);
@@ -99,10 +100,10 @@
 			els = outer.querySelectorAll('[placeholder]');
 			for (i = 0; i < els.length; i++) {
 				el = els[i];
-				el.setAttribute('placeholder', $t(el.getAttribute('placeholder')) );
+				el.setAttribute( 'placeholder', $t(el.getAttribute('placeholder')) );
 			}
 		}
-		return outer.innerHTML;
+		if(outer.innerHTML) return outer.innerHTML.replace(/<\/{0,1}tbody>/g,'');
 	};
 	
 	

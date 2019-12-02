@@ -1,8 +1,8 @@
  /**
   * CMD + AMD，js模块化。
   * @author: leiguangyao;
-  * @date: 20180807~~20191121;
-  * @version: 3.0.3
+  * @date: 20180807~~20191129;
+  * @version: 3.0.4
   * */
 (function (globals, doc) {
 	'use strict';
@@ -50,7 +50,7 @@
 		if(len === 1){
 			return JSON.parse( JSON.stringify(obj) ); 
 		}
-		if(Object.typeof(obj)!=='object') obj = {};
+		if(getType(obj)!=='object') obj = {};
 		obj = JSON.stringify(obj).replace(/^\{|\}$/g, '');
 		for(; i < len; i++){
 			obj += "," + JSON.stringify(arguments[i]).replace(/^\{|\}$/g, '');
@@ -81,7 +81,7 @@
 		}
 		if( isReady() ) globals.setTimeout( execute );
 	};
-	function define(id/*id, rely, fn*/) {
+	function $_define_(id/*id, rely, fn*/) {
 		var fn, rely;
 		if(isCfged) id = toVars(id);
 		if(arguments.length > 2){
@@ -92,8 +92,8 @@
 			mapping[id] = {mod: create(id, parseRely(rely, fn, id)), fn: fn};
 		} else if(id) initAuto(id, fn);
 	};
-	define.amd = define.cmd = 'CMD + AMD';
-	function require(id) {
+	$_define_.amd = $_define_.cmd = 'CMD + AMD';
+	function $_require_(id) {
 		id = toVars(id);
 		if(cache[id]) return cache[id];
 		var M = mapping[id], c;
@@ -102,12 +102,12 @@
 			return;
 		}
 		c = M.mod.exports = {};
-		cache[id] = M.fn.call(c, require, c, M.mod) || M.mod.exports;
+		cache[id] = M.fn.call(c, $_require_, c, M.mod) || M.mod.exports;
 		delete mapping[id];
 		return cache[id];
 	};
 	function Modules(id, rely){
-		this.id = id;
+		this.id = id || getID();
 		this.rely = rely || '';
 		if(isCfged) this.uri = alias[id] || '';
 	}
@@ -135,8 +135,8 @@
 	
 	function configEvent(urls, fn, id){ wait[id] = {r:urls, fn:fn}; }
 	function forWait(){
-		var i , len = initFn.length, o, id, r;
-		for (i = 0; i < len; i++) {
+		var i , map, o, id, r;
+		for (i = 0; i < initFn.length; i++) {
 			id = initFn[i].mod.id;
 			if(o = wait[id]){
 				r = parseRely(o.r, o.fn);
@@ -147,10 +147,10 @@
 		for (i in wait){
 			o = wait[i];
 			r = parseRely(o.r, o.fn);
-			if(len = mapping[i]){
+			if(map = mapping[i]){
 				delete mapping[i];
 				id = toVars(i);
-				mapping[id] = {mod: create(id, r), fn: len.fn};
+				mapping[id] = {mod: create(id, r), fn: map.fn};
 			}
 		}
 		wait = {};
@@ -184,7 +184,7 @@
 				head.appendChild(es);
 			}
 		}
-		if( isFn(fn) ) initFn.push({mod: create(getID()), fn: fn});
+		if( isFn(fn) ) initFn.push({mod: create(), fn: fn});
 		if(curReq==null && plugins.length==0 && isLink) execute();
 		if(curReq != null || plugins.length == 0) return;
 		request();
@@ -194,7 +194,7 @@
 		curReq = plugins.shift();
 		es.id = curReq;
 		es.type = 'text/javascript';
-		es.src = tojs(curReq);
+		es.src = tojs(addBase(curReq));
 		if(isIE8) es.onreadystatechange = onload;
 		else es.onload = onload;
 		es.onerror = errors;
@@ -229,12 +229,12 @@
 		}
 	}
 	function execute() {
-		if(!isCfged) return;
+		// if(!isCfged) return;
 		while(initFn.length > 0){
 			if(curReq != null) return;
 			var M = initFn.shift(), entry, c = M.mod.exports = {};
 			if(!isFn(M.fn)) entry =  M.fn;
-			else entry = M.fn.call(c, require, c, M.mod) || M.mod.exports;
+			else entry = M.fn.call(c, $_require_, c, M.mod) || M.mod.exports;
 			if(isFn(entry.init)) entry.init();
 			if(isFn(entry.events)) entry.events();
 		}
@@ -251,7 +251,7 @@
 	}
 	//配置
 	var config = {
-		base: './', // 全局的基础路径
+		base: location.href.match(/[^?#]*\//)[0], // 全局的基础路径
 		paths: {}, // 路径配置
 		alias: {}, // 别名配置
 		vars: {}, // 变量配置
@@ -259,7 +259,7 @@
 		map: null, //映射配置[fn, arr[reg, str]]
 		debug: false, charset: 'utf-8'
 	};
-	exp.define = define;
+	exp.define = $_define_;
 	var $module = exp.$module = {
 		init: function(rely, exFn){
 			function keep(){
@@ -292,6 +292,9 @@
 			for(k in cfg.alias){alias[toVars(k)] = cfg.alias[k];}
 			cfg.alias = alias;
 			
+			if(typeof(cfg.base)=="string"){
+				if( !(/\/$/.test(cfg.base)) ) cfg.base += '/';
+			} else cfg.base = config.base;
 			for(k in alias) {
 				for(p in paths){
 					var reg = new RegExp('^'+p);
@@ -300,7 +303,7 @@
 						alias[k] = uri; break;
 					}
 				}
-				alias[k] = addBase(parseCfgMap(alias[k]));
+				// alias[k] = addBase(parseCfgMap(alias[k]));
 			}
 			
 			isCfged = true;
@@ -308,10 +311,8 @@
 			return isCfged;
 			// forWait();
 		},
-		addConfig: function(obj){
-			
-		},
-		require: require
+		// addConfig: function(obj){},
+		require: $_require_
 	};
 	
 	function parseCfgMap(uri) {
@@ -326,21 +327,22 @@
 		return ret;
 	}
 	function addBase(refUri) {
-		var base = cfg.base;
-		if(typeof(base)!="string") return refUri;
+		var reg = /^\.\/|^\.\.\/|^http|^file:/;
+		if(reg.test(refUri)) return refUri;
 		if (refUri.indexOf("//") === 0) {
 			return location.protocol + refUri;
 		}
-		if(/^\.\/|^\.\.\//.test(refUri)) return refUri;
-		
-		if( !(/\/$/.test(base)) ) base += '/';
-		var uri = refUri.replace(/^\/+/, '');
-		return base + uri;
+		return refUri.replace(/^@\//, cfg.base);
 	}
 
 	Object.addProto(globals, exp, false);
 	Object.setProto(Modules.prototype, 'loader', function (src, fn, erFn){
 		preload(src, 'async', fn, erFn);
 	}, false);
-	define('loader', function(){ return Modules.prototype.loader; });
+	$_define_('loader', function(){ return Modules.prototype.loader; });
+	!function(){
+		var tag = doc.scripts;
+		tag = tag[tag.length-1];
+		tag.parentNode.removeChild(tag);
+	}();
 }(window, document));

@@ -1,3 +1,4 @@
+//检测控制台。
 ;( function( global, factory ) {
 	if ( typeof module === "object" && typeof module.exports === "object" ) {
 		module.exports = factory();

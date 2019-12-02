@@ -2,36 +2,37 @@
 <html class="html">
 <head>
 	<meta http-equiv="content-type" content="text/html; charset=utf-8">
-	<meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0, user-scalable=no"/>
+	<meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0, user-scalable=no" />
 	<meta http-equiv="cache-control" content="no-store" />
 	<meta http-equiv="Pragma" content="no-cache" />
 	<meta http-equiv="expires" content="0" />
 	<title>CMD+AMD模块加载</title>
-	
+
 	<style>
 		.html{font-size: 16px;margin: 8px;}
-		/* .selectbox select:-internal-list-box option:checked {
-			color: red;
-		} */
+		.browsers{opacity: 1; position: relative;}
+		.ripple {
+		    opacity: 0.3;animation: MuiTouchRipple-keyframes-enter 550ms cubic-bezier(0.4, 0, 0.2, 1);transform: scale(1);
+		}
+		.selectbox select:-internal-list-box option:checked {color: red;}
 		.sel {
-			width: 150px;
-			background-color: transparent;
-			border: 2px solid lightblue;
-			border-radius: 4px;
-			overflow: hidden;
-			padding: 5px 3px;
+			width: 150px; background-color: transparent; border: 2px solid lightblue; border-radius: 4px; overflow: hidden; padding: 5px 3px;
 		}
 		.sel:focus{-webkit-outline-radius: 4px;}
 	</style>
+
 	
+	<!-- <script type="text/babel" src="https://unpkg.com/react@16/umd/react.development.js"></script> -->
+	<!-- <script type="text/babel" src="https://unpkg.com/react-dom@16/umd/react-dom.development.js"></script> -->
+	<!-- 生产环境中不建议使用 -->
+	<!-- <script src="https://unpkg.com/babel-standalone@6.26.0/babel.min.js"></script> -->
+	<script src="frame/CMD.js"></script>
 	<!-- <script src="frame/sea-debug.js"></script> -->
-	<!-- <script src="frame/RequireJS.mini.js"></script> -->
-	<script src="frame/CMD.js" ></script>
-	<!-- <script src="./frame/CMD.js" ></script> -->
 </head>
 <body>
 	<p style="text-align: center;" i18n="com.title">ABC</p>
 	<input type="text" placeholder="com.title" />
+
 	<div class="selectbox">
 		<select class="sel" autocomplete="off">
 			<option value="看书">看书</option>
@@ -41,7 +42,7 @@
 		</select>
 		<!-- <br /> -->
 		<label>Choose datalist:</label>
-		<input list="browsers" name="myBrowser" /></label>
+		<input list="browsers" class="browsers" />
 		<datalist id="browsers">
 			<option value="Chrome">看书</option>
 			<option value="Firefox">旅游</option>
@@ -50,25 +51,96 @@
 			<option value="Safari">IOS</option>
 		</datalist>
 	</div>
-	<ul id="list">
+	<table id="list">
+
+	</table>
+	
+	<div id="react">
 		
-	</ul>
+	</div>
+	
+
+		
+		
+	<fo:table-and-caption>
+		<fo:table>
+
+			<fo:table-column column-width="25mm" />
+			<fo:table-column column-width="25mm" />
+
+			<fo:table-header>
+				<fo:table-cell>
+					<fo:block font-weight="bold">Car</fo:block>
+				</fo:table-cell>
+				<fo:table-cell>
+					<fo:block font-weight="bold">Price</fo:block>
+				</fo:table-cell>
+			</fo:table-header>
+
+			<fo:table-body>
+				<fo:table-row>
+					<fo:table-cell>
+						<fo:block>Volvo</fo:block>
+					</fo:table-cell>
+					<fo:table-cell>
+						<fo:block>$50000</fo:block>
+					</fo:table-cell>
+				</fo:table-row>
+				<fo:table-row>
+					<fo:table-cell>
+						<fo:block>SAAB</fo:block>
+					</fo:table-cell>
+					<fo:table-cell>
+						<fo:block>$48000</fo:block>
+					</fo:table-cell>
+				</fo:table-row>
+			</fo:table-body>
+
+		</fo:table>
+	</fo:table-and-caption>
+
+
+
+
 	<template id="listDom">
-		<li i18n="com.title">{asdf}</li>
-		<li>{99}</li>
+		<tr>
+			<td>
+				<li i18n="com.title">{asdf}</li>
+				<li i18n="com.title">{99}</li>
+			</td>
+		</tr>
 	</template>
 </body>
+
+
+
 <script type="text/javascript">
-	$module.init(['./libs/libsCfg'], function (require, exports, module) {
+
+
+!function(){
+	
+	// useSeajs();
+	// return
+	
+	$module.init(['./libs/libsCfg'], function(require, exports, module) {
+		
 		
 	});
-	
-	define('p', function(){
-		console.log('define')
-		return {'def': '测试'}
+
+	define([], function() {
+		console.log('define 测试')
+		
 	});
+}();
+
+function useSeajs(){
 	
-	
+	seajs.config({});
+	// debugger
+	seajs.use('abc', function(){
+		console.log('sea')
+	})
+}
 </script>
 
 </html>
