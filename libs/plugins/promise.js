@@ -1,8 +1,8 @@
 /**
  * ES5模仿Promise
  * @author: leiguangyao;
- * @date 20191209~~20191217;
- * @version: 1.0.2;
+ * @date 20191209~~20191220;
+ * @version: 1.0.3;
  */
 ;( function( global, factory ) {
 	if ( typeof module === "object" && typeof module.exports === "object" ) {
@@ -32,7 +32,7 @@
 		if(!arr) return;
 		var fn = arr.shift();
 		while(fn){
-			fn.apply(null, arguments);
+			fn.apply(fn, arguments);
 			fn = arr.shift();
 		};
 		if(!arr.length) delete this.dict[type];
@@ -50,7 +50,7 @@
 		
 		function resolve(result) {
 			self.state = "then";
-			dispatch(self, result);
+			dispatch.apply(self, arguments);
 		}
 		
 		function reject(reason) {
@@ -60,11 +60,11 @@
 	}
 	
 	function dispatch(self, val){
-		self.value = val;
-		if(self.obs) {
-			self.obs.emint('waitExecute', val);
+		this.value = arguments;
+		if(this.obs) {
+			this.obs.emint('waitExecute', arguments);
 		}
-		self.obs = null;
+		this.obs = null;
 	}
 	function waits(self, callback, reason){
 		return new EnsurePromise(function(resolve, reject){
@@ -80,8 +80,8 @@
 	}
 	function execute(type, callback, reason, value, resolve, reject){
 		var param, fn = type === 'then' ? callback : reason;
-		if(fn instanceof Function) param = fn(value);
-		else console.warn("Then's second parameter is not a function");
+		if(fn instanceof Function) param = fn.apply(fn, value);
+		// else console.warn("Then's second parameter is not a function");
 		if( param instanceof EnsurePromise){
 			param.then(resolve, reject);
 		} else resolve(param);
@@ -97,8 +97,8 @@
 	module.exports = EnsurePromise;
 	var proto = EnsurePromise.prototype;
 	
-	proto.then = function(callback, reason){
-		if(isValid(callback, reason)) return waits(this, callback, reason);
+	proto.then = function(success, fail){
+		if(isValid(success, fail)) return waits(this, success, fail);
 		else return console.warn('Then "param" is not a function!');
 	};
 	proto = null;

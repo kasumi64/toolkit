@@ -93,56 +93,64 @@
 	$module.init(['./libs/libsCfg'], function(require, exports, module) {
 		
 		var ajax = require('ajax');
-		ajax.baseUrl('http://localhost:8088/');
-		
+		ajax.baseUrl('http://127.0.0.1:8088/');
 		var testBtn = document.querySelector('#testBtn');
+		var opt = {
+			url: 'json?num=123',
+			// method: 'get',
+			onloadstart: function(e){
+				// console.log('loadstart');
+				// e.currentTarget.abort();
+			},
+			onprogress: function(e){
+				// console.log('progress');
+			}
+		}
+		
+		var Promi = require('promise');
+		
 		testBtn.onclick = function (e){
 			
+			// ajax.download('http://127.0.0.1:8848/toolkit/img/gril.ico',{img:'jpg'}).then((tag, e)=>{
+			// 	document.body.appendChild(tag);
+			// 	tag.download = 'name.jpg'
+			// 	// tag.click();
+			// 	// document.body.removeChild(tag);
+			// });
+			
+			ajax.post(opt, {str: 'ABC'}).then( res => {
+				console.log('post_success_', res);
+			});
+			
+		};
+		
+		
+		
+		return
+		
+		function upload(){
 			var file = document.querySelector('#file');
-			
-			console.log(file.files)
-			console.log(!'0')
-			
-			
-			
-			
-			return
-			if(file.files.length == 0) return
+			// if(file.files.length == 0) return
 			var form = new FormData(document.querySelector('#form'));
-			// form.append('str','ABC');
-			// form.append('num','123456');
+			form.append('str','ABC');
+			form.append('num','123456');
 			form.forEach(function(val, key){
-				// console.log(val, key);
+				console.log(key, val);
 			});
 			var opt = {
-				url: 'upload/txt',
+				url: 'upload',
 				upload: {
 					progress: function(p, s, t, e){
 						console.log(parseInt(p*100)+'%', s, t)
 					}
 				}
 			}
-			
 			ajax.upload(opt, form).then(res=>{
 				console.log(res)
-			})
+			});
 		}
 		
 		
-		
-		return
-		
-		var opt = {
-			url: 'json?num=123',
-			// method: 'get',
-			loadstart: function(e){
-				// console.log('loadstart', e);
-				// e.currentTarget.abort()
-			},
-			progress: function(e){
-				// console.log('progress', e);
-			}
-		}
 		ajax.download('http://127.0.0.1:8848/toolkit/img/gril.ico').then(tag=>{
 			document.body.appendChild(tag);
 			tag.download = 'name.jpg'
