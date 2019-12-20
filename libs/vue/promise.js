@@ -39,15 +39,15 @@ module.exports = Promise
 //以上就大致实现了简单的Promise功能了,但是还没有实现链式调用
 // 下面简单改一个resolve的链式调用
 Promise.prototype.then = function(resolveFull,rejectFull){
-   let self = this
-    if(self.state == "resolve"){
-        return new Promise((resolve,reject)=>{
-			let  x = resolveFull(self.value)
-			if( x instanceof Promise){
-                x.then(resolve,reject)
+	var self = this;
+	if(self.state == "resolve"){
+		return new Promise(function(resolve, reject){
+			var x = resolveFull(self.value);
+			if( x instanceof EnsurePromise){
+				x.then(resolve, reject);
 			}else{
-			   resolve(x)
+				x.resolve(x)
 			}
-		}
+		});
 	}
 }

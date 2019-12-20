@@ -19,7 +19,9 @@
 			observer:	'p/observer_es5.js',
 			forbid: 	'P/forbid.js', //检测控制台。
 			getDate:	'P/getDate.js',
+			ajax:		'P/ajax.js',
 			http:		'P/httpRequest.js',
+			promise:	'P/promise.js',
 			broadcast:	'P/broadcast.js',
 			renderData:	'vue/renderData.js',
 			jquery: 	'JQ/jquery-3.3.1.js',
@@ -40,7 +42,7 @@
 			'zhcn': 'locale'
 		},
 		// 预加载项
-		preload: ['initTag', 'kit'],
+		preload: ['initTag', 'ajax'],
 		// 映射配置
 		// map: [
 		// 	[ /(.*?)(\.js)$/i , '$1-debug.js'],

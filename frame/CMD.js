@@ -1,8 +1,8 @@
  /**
   * CMD + AMD，js模块化。
   * @author: leiguangyao;
-  * @date: 20180807~~20191129;
-  * @version: 3.0.4
+  * @date: 20180807~~20191213;
+  * @version: 3.0.6;
   * */
 (function (globals, doc) {
 	'use strict';
@@ -123,9 +123,10 @@
 		.replace(/{(\w+)}/g, function(o, v){return config.vars[v]||o});
 		
 		var reg;
-		if(fn.indexOf('function')==0) reg = (/.+?\((.+?)[,)]/).exec(fn);
-		else if(fn.indexOf('(')==0) reg = (/\((.+?)\){0,1}=>/).exec(fn);
-		else reg = (/(.+?)\){0,1}=>/).exec(fn);
+		if(/^function|^asyncfunction/.test(fn)) reg = (/.+?\((.+?)[,)]/).exec(fn);
+		else if(/^\(|^async\(/.test(fn)) reg = (/\((.+?)\){0,1}=>/).exec(fn);
+		else if(fn.indexOf('async')==0) reg = (/^async(.+?)=>/).exec(fn);
+		else reg = (/(.+?)=>/).exec(fn);
 		
 		if(!reg||reg[1].indexOf(')')==0) return urls;
 		fn.replace(new RegExp(reg[1]+'\\((.+?)\\)','g'), function(a, w){urls.push(w)});
@@ -172,6 +173,7 @@
 			var url = use[i];
 			url = alias[url] || url;
 			if(preloadObj[url]) continue;
+			if(mapping[url]) continue; //一个js有多个defind
 			preloadObj[url] = url;
 			if(!regCSS.test(url)) {
 				plugins.push(url);
@@ -240,7 +242,7 @@
 		}
 		if(firstInit){
 			firstInit = false;
-			console.log('initTime: ', Date.now() - initTime);
+			console.log('initScript: ', Date.now() - initTime);
 		}
 		errorFn = {};
 	}

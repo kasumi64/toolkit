@@ -1,4 +1,6 @@
-;define('fetch', function (r, exp)
+
+
+;define('fetch', function (require, exports, module)
 {
 	function HttpFetch(){
 		//一个配置项对象，包括所有对请求的设置。可选的参数有：
@@ -20,7 +22,7 @@
 			options = {
 				method: "POST",
 				headers: {
-					"Content-Type": "application/x-www-form-urlencoded;charset=utf-8"
+					"Content-Type": "application/x-www-form-urlencoded;charset=utf-8"// GET
 				},
 				body: "firstName=Nikhil&favColor=blue&password=easytoguess"
 			}
@@ -29,8 +31,8 @@
 			
 		};
 		var myHeaders = new Headers();
-		myHeaders.set('Content-Type', 'application/json;charset=utf-8');
-		myHeaders.set('Accept', 'application/json, text/plain, */*');
+		myHeaders.set('Content-Type', 'application/json;charset=utf-8');//服务器 multipart/form-data
+		myHeaders.set('Accept', 'application/json, text/plain, */*');//web端
 		P.json = function(url, param, fn){
 			options = {
 				method: "POST",
@@ -51,10 +53,10 @@
 			});
 		};
 	}
-	return exp = function(){ return new HttpFetch(); };
+	return function(){ return new HttpFetch(); };
 });
 
-define('XHR', function (r, exp)
+define('XHR', function (require, exports, module)
 {
 	function HttpRequest()
 	{
@@ -235,7 +237,8 @@ define('XHR', function (r, exp)
 	function _isObject(obj){
 		return typeof(obj)=="object";
 	}
-/***********************************************************************/	
+/***********************************************************************/
+	var exp = {};
 	var _http = new HttpRequest();
 	exp.ajax = _http.request;
 	exp.ajaxJson = function(url,valObj,func)
