@@ -16,7 +16,7 @@
 		alias: {
 			kit: 		'frame/toolkit.js',
 			bingo:		'P/observe_es6.js',
-			observer:	'p/observer_es5.js',
+			observer:	'P/observer_es5.js',
 			forbid: 	'P/forbid.js', //检测控制台。
 			getDate:	'P/getDate.js',
 			ajax:		'P/ajax.js',

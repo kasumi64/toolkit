@@ -1446,6 +1446,7 @@
 	Object.addProto(pro, _qsObj, false, true, false);
 	Object.setProto(ToolKit, 'constructor', _qs, false);
 	_qsObj = pro = null;
+	module.exports = ToolKit;
 	return ToolKit;
 });
 

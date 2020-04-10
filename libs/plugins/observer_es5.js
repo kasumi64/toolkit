@@ -1,7 +1,7 @@
 /*
  * 观察者模式
  * @author: leiguangyao;
- * @date: 20170706-20180816;
+ * @date: 20170706-20200410;
  */
 ;define('observer_es5', function (require, exports)
 {
@@ -11,12 +11,12 @@
 			throw new Error('Observer is a single, Please use "getInstance()" method.');
 			return;
 		}
-		var dictionary = {};
+		var dictionary = {}, onceDict = {};
 		
-		function bingo(master, fn){
+		function bingo(master, fn, dict){
 			if(!(typeof master == 'string'&&fn instanceof Function)) return false;
-			if(!dictionary[master]) dictionary[master] = [];
-			if(isHas(fn, dictionary[master])) return false;
+			if(!dict[master]) dict[master] = [];
+			if(isHas(fn, dict[master])) return false;
 			return true;
 		}
 		function isHas(fn, arr){
@@ -27,15 +27,15 @@
 		//绑定
 		this.on = function(master, fn)
 		{
-			if(!bingo(master, fn)) return this;
-			dictionary[master].push({once: false, fn: fn});
+			if(!bingo(master, fn, dictionary)) return this;
+			dictionary[master].push(fn);
 			return this;
 		};
 		//解绑
 		this.del = function(master, fn)
 		{
 			var keyCode = dictionary[master];
-			if(!(keyCode != null&&fn instanceof Function)) return console.warn('DelBinding is fail!');
+			if(keyCode == null) return this;
 			var index = keyCode.indexOf(fn);
 			if(index == -1) return this;
 			keyCode.splice(index, 1);
@@ -44,22 +44,26 @@
 		//执行回调，第一个入参为主码(必须的)，其它的为子码。
 		this.emint = function(master/*,[...args]*/)
 		{
-			var dict = dictionary[master], o;
-			if( !dict ) return;
-			for (var i = 0; i < dict.length; i++) {
-				o = dict[i];
-				o.fn.apply(o, arguments);
-				if(o.once){
-					dict.splice(i, 1);
-					i--;
-				}
+			var dict = dictionary[master], i, len;
+			if( dict ){
+				len = dict.length;
+				for (i = 0; i < len; i++)
+					dict[i].apply(null, arguments);
+			}
+			
+			dict = onceDict[master];
+			if( dict ){
+				len = dict.length;
+				for (i = 0; i < len; i++)
+					dict[i].apply(null, arguments);
+				delete onceDict[master];
 			}
 			return this;
 		};
 		this.once = function(master, fn)
 		{
-			if(!bingo(master, fn)) return this;
-			dictionary[master].push({once: true, fn: fn});
+			if(!bingo(master, fn, onceDict)) return this;
+			onceDict[master].push(fn);
 			return this;
 		};
 		//清除master主码
