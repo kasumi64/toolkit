@@ -1,6 +1,6 @@
 /*
  * @author: leiguangyao;
- * @date: 20160523--20191119;
+ * @date: 20160523--20200420;
  */
 ;(function(doc){ //20180712
 	'use strict';
@@ -362,7 +362,7 @@
 	 *  }
 	 *  extendFn(Son,Father);
 	 */
-	ToolKit.extendFn = function(subClass, superClass) {
+	ToolKit.extendClass = function(subClass, superClass) {
 		var F = function(){};
 		F.prototype = superClass.prototype;
 		subClass.prototype = new F();
@@ -377,13 +377,24 @@
 		Object.defineProperty(superClass.prototype,'constructor', obj);
 		F = obj = null;
 	};
+	ToolKit.copyJson = function(obj){
+		var length = arguments.length;
+		if(length == 1) return JSON.parse(JSON.stringify(obj));
+		var i, str, json = JSON.stringify(obj).replace(/^\{|\}$/g, '');
+		for (i = 1; i < length; i++) {
+			str = JSON.stringify(arguments[i]).replace(/^\{|\}$/g, '');
+			if(str) json += ',' + str;
+		}
+		json = json.replace(/^,+/, '');
+		return JSON.parse('{' + json + '}');
+	};
 	/**扩展工具:*/
 	ToolKit.extend = function() {
 		var length, target, i, options, 
 			keys, attr, val, copy, isArr;
 		length = arguments.length;
 		if(length == 1){
-			target = this;
+			target = {};
 			i = 0;
 		} else {
 			target =arguments[0] || {};
@@ -394,7 +405,7 @@
 				for(keys in options){
 					attr = target[keys];
 					val = options[keys];
-					if ( target === val ) continue;
+					if ( attr === val ) continue;
 					if(val&&(_isObject(val)||(isArr=(val instanceof Array)))){
 						if ( !isArr ) {
 							copy = _isObject( attr ) ? attr : {};
@@ -836,7 +847,7 @@
 			}
 			return obj;
 		};
-		pro.extend = function () { return kit.extend.apply(_qs.prototype,arguments); };
+		pro.extend = function () { return kit.extend.apply(_qs.prototype, arguments); };
 		pro.show = function(str) {
 			str = typeof(str)=="string" ? str : 'block';
 			return this.css('display', str);

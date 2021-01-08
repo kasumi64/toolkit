@@ -78,6 +78,30 @@
 			</td>
 		</tr>
 	</template>
+	
+	
+	
+	<!-- <div id="live2d-widget" class="live2d-widget-container" style="position: fixed; right: 0px; bottom: 0px; width: 200px; height: 400px; z-index: 99999; opacity: 1; pointer-events: none;">
+		<canvas id="live2dcanvas" width="400" height="800" style="position: absolute; left: 0px; top: 0px; width: 200px; height: 400px;">
+		</canvas>
+	</div>
+	
+	<script type="text/javascript" charset="utf-8"  src="https://files.cnblogs.com/files/liuzhou1/L2Dwidget.0.min.js"></script>
+	<script type="text/javascript" charset="utf-8"  src="https://files.cnblogs.com/files/liuzhou1/L2Dwidget.min.js"></script>
+	<script type="text/javascript">
+		L2Dwidget.init({
+			"display": {
+				"superSample": 2,
+				"width": 200,
+				"height": 400,
+				"position": "right",
+				"hOffset": 0,
+				"vOffset": 0
+			}
+		});
+	</script> -->
+	
+	
 </body>
 
 
@@ -92,6 +116,7 @@
 	
 	$module.init(['./libs/libsCfg'], function(require, exports, module) {
 		
+		var kit = require('kit');
 		var ajax = require('ajax');
 		ajax.baseUrl('http://127.0.0.1:8088/');
 		var testBtn = document.querySelector('#testBtn');
@@ -108,6 +133,19 @@
 		}
 		
 		var Promi = require('promise');
+		var bus = require('bus_es6').single();
+		
+		var obj = {
+			a: {
+				b: '123',
+				c: {d: 789}
+			},
+			abc: 'ABC',
+			dd: {
+				cc: 'CC'
+			}
+		};
+		obj = bus.polyfill(obj);
 		
 		testBtn.onclick = function (e){
 			
@@ -118,11 +156,24 @@
 			// 	// document.body.removeChild(tag);
 			// });
 			
+			obj.dd.cc= 789
+			// bus.emit('events', )
+			
+			return
+			
 			ajax.post(opt, {str: 'ABC'}).then( res => {
 				console.log('post_success_', res);
 			});
 			
 		};
+		
+		bus.on('update:', (key, val) => {
+			console.log(key);
+			obj.dd.cc = 66
+		});
+		bus.on('events', (...args) => {
+			console.log(...args);
+		});
 		
 		
 		

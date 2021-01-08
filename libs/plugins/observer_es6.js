@@ -1,13 +1,13 @@
 /*
  * 观察者模式observe
  * @author: leiguangyao;
- * @date: 20190611-20190621;
+ * @date: 20190611-20200421;
  */
 ;( function( global, factory ) {
 	if ( typeof module === "object" && typeof module.exports === "object" ) {
 		module.exports = factory();
 	} else if ( typeof define === "function" ) {
-		define('bingo', factory);
+		define('bus_es6', factory);
 	} else if ( typeof global === 'object' ) {
 		global.$bingo = factory();
 	} else {
@@ -16,10 +16,23 @@
 }) ( window || this, function(){
 	"use strict";
 	
-	class BingoData { //observe
+	function i18nVal(keys, obj){
+		var arr = keys.split('.'), len = arr.length, val;
+		for (let i = 0; i < len; i++) {
+			val = obj[arr[i]];
+			if(val == null) return '';
+		}
+		return val;
+	}
+	
+	class Bus { //observe
 		
 		constructor (that){
-			Reflect.defineProperty(this, 'dictionary', {
+			Reflect.defineProperty(this, '_dictionary', {
+				value: new Map(),
+				enumerable: false
+			});
+			Reflect.defineProperty(this, '_onceDict', {
 				value: new Map(),
 				enumerable: false
 			});
@@ -29,80 +42,102 @@
 			});
 		}
 		
-		polyfill (target){
+		polyfill (target, type, _key){ //递归所有属性
 			if( !(target instanceof Object) ) return target;
 			for (let k in target) {
 				if(target[k] instanceof Object){
-					target[k] = this.polyfill(target[k]);
+					if(_key) _key += '.' + k;
+					else _key = k;
+					console.log(k);
+					target[k] = this.polyfill(target[k], type, _key);
 				}
 			}
-			return this.proxy(target);
+			return this.proxy(target, type, _key);
 		}
 		
-		proxy(target){
-			const self = this;
+		proxy(target, type, _keys){
+			// const self = this;
 			return new Proxy(target, {
-				set: function(obj, key, val, target){
-					let old = obj[key];
-					if(val instanceof Object) val = self.proxy(val);
-					obj[key] = val;
-					self.emint('update:'+key, val, old);
-					return true;
+				set: (obj, key, val, receiver) => {
+					let old = obj[key]; //旧数据
+					if(val === old) return;
+					if(val instanceof Object) val = this.proxy(val);//监听新对像
+					obj[key] = val; //新数据
+					if(_keys) _keys += '.' + key;
+					this.emit(type||'update:', key, val, old, _keys);
 				},
-				get: function(obj, key, target){
-					return obj[key]
+				get: function(obj, key, receiver){
+					let val = obj[key];
+					if(typeof(val)=="function") val = val.bind(obj);
+					return val;
 				}
 			});
 		}
 		
-		on (master, fn/*, once */){
-			if( !(fn instanceof Function) ) return this;
-			if(!this.dictionary.has(master)) this.dictionary.set(master, new Set);
-			let dict = this.dictionary.get(master);
-			if(dict.has(fn)) return console.error(`type: ${master}./ Function is already registered.`);
-			Reflect.defineProperty(fn, '$_once_', {
-				value: arguments[2],
-				enumerable: false,
-				writable: false,
-				configurable: false
-			});
-			dict.add(fn);
+		_bingo(master, fn, dict){
+			if(!(fn instanceof Function)) return false;
+			if(!dict.has(master)) dict.set(master, new Set);
+			if(dict.get(master).has(fn)) return console.warn(`type: ${master}./ Function is already registered.`);
+			return true;
+		}
+		
+		on (master, fn){
+			if(!this._bingo(master, fn, this._dictionary)) return this;
+			this._dictionary.get(master).add(fn);
 			return this;
 		}
 		
-		emint (master, ...args){
+		emit (master, ...args){
 			// console.log(master, args);
-			if(!this.dictionary.has(master)) return this;
 			const that = this.that;
-			this.dictionary.get(master).forEach((fn, k, set) => {
-				let arr = [...args];
-				if(fn.$_once_ === true) set.delete(k);
-				fn.call(that, ...arr);
-			});
+			if(this._dictionary.has(master)){
+				this._dictionary.get(master).forEach(fn => {
+					fn.apply(that, args);
+				});
+			}
+			if(this._onceDict.has(master)){
+				this._onceDict.get(master).forEach(fn => {
+					fn.apply(that, args);
+				});
+				this._onceDict.delete(master);
+			}
 			return this;
 		}
 		
 		once (master, fn){
-			this.on(master, fn, true);
+			if(!this._bingo(master, fn, this._onceDict)) return this;
+			this._onceDict.get(master).add(fn);
 			return this;
 		}
 		
-		clear(master, fn){
+		clear (master, fn){
 			if(fn instanceof Function){
-				if(!this.dictionary.has(master)) return this;
-				this.dictionary.get(master).forEach((fn, k, set) => {
-					if(fn === fn) {
-						set.delete(k);
-						return this;
-					}
-				});
-			} else if(master) this.dictionary.delete(master);
-			else this.dictionary.clear();
+				if(this._dictionary.has(master)) {
+					this._dictionary.get(master).delete(fn);
+				}
+				if(this._onceDict.has(master)) {
+					this._onceDict.get(master).delete(fn);
+				}
+			} else if (master) {
+				this._dictionary.delete(master);
+				this._onceDict.delete(master);
+			} else {
+				this._dictionary.clear();
+				this._onceDict.clear();
+			}
 			return this;
 		}
 		
+		static getInstance(){
+			return single;
+		}
 	};
-	return self => { return new BingoData(self); };
+	const single = new Bus();
+	// Bus.getInstance = function(){return single;};
+	return {
+		bus: self => { return new Bus(self); },
+		single: () => Bus.getInstance()
+	}
 });
 
 /*

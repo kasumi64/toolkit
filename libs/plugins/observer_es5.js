@@ -3,7 +3,7 @@
  * @author: leiguangyao;
  * @date: 20170706-20200410;
  */
-;define('observer_es5', function (require, exports)
+;define('bus_es5', function (require, exports)
 {
 	function Observer()
 	{
@@ -42,7 +42,7 @@
 			return this;
 		};
 		//执行回调，第一个入参为主码(必须的)，其它的为子码。
-		this.emint = function(master/*,[...args]*/)
+		this.emit = function(master/*,[...args]*/)
 		{
 			var dict = dictionary[master], i, len;
 			if( dict ){
@@ -69,12 +69,11 @@
 		//清除master主码
 		this.clear = function(master) { delete dictionary[master]; return this; };
 	}
-	var instance; //单例
-	function getInstance(){
-		if(instance == void 0) instance = new Observer('6KeC5a+f6ICF');
-		return instance;
-	}
-	return getInstance();
+	var single = new Observer('6KeC5a+f6ICF'); //单例
+	/* function getInstance(){
+		return single;
+	} */
+	return single;
 });
 
 if (!Array.prototype.indexOf) {

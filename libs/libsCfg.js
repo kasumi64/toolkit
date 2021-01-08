@@ -15,8 +15,8 @@
 		// 别名配置
 		alias: {
 			kit: 		'frame/toolkit.js',
-			bingo:		'P/observe_es6.js',
-			observer:	'P/observer_es5.js',
+			bus_es5:	'P/observer_es5.js',
+			bus_es6:	'P/observer_es6.js',
 			forbid: 	'P/forbid.js', //检测控制台。
 			getDate:	'P/getDate.js',
 			ajax:		'P/ajax.js',
