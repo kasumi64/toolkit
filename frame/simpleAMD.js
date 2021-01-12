@@ -1,5 +1,5 @@
 // 简易的AMD模块化加载
-// 2021-1-8
+// 2021-1-8, v1.1.20210112
 ;(function(win, doc){
 	const initFn = [], map = {}, cache = {};
 	var curReq, relyArr = [];
@@ -15,7 +15,11 @@
 	function isArray(arr){
 		return Object.prototype.toString.call(arr) == '[object Array]';
 	}
-
+	/**
+	 * id: string、[str]、function
+	 * rely: string、[str]、function
+	 * plugin: function
+	 */
 	function define(id, rely, plugin){
 		var fn, length = arguments.length;
 		if(length == 1){
@@ -31,37 +35,41 @@
 		if( isArray(id) ) rely = id;
 		else cache[id] = new Module(id, fn);
 		
-		if(rely) relyArr = relyArr.concat(rely);
+		if(rely) live(rely);
 		nextTick(id, fn);
 	}
 	define.amd = define.cmd = 'CMD + AMD';
 	win.define = define;
 	
+	function live(rely){
+		let arr = isArray(rely) ? rely : [rely];
+		let i, len = arr.length, path;
+		for (i = 0; i < len; i++) {
+			path = arr[i];
+			if(!path || loaded[path]) continue;
+			relyArr.push(path);
+		}
+	}
+	
 	function nextTick(id, fn){
 		if(typeof(id) != 'string') initFn.push(new Module('auto', fn));
-		preload();
-		execute();
+		if(!curReq) preload();
 	}
 	
 	var loaded = {}, head = doc.querySelector('head');
 	function preload(){
-		let path;
-		while(path = relyArr.shift()){
-			if(loaded[path]) return;
-			loaded[path] = path;
-			request(path);
-		}
-	}
-	var regCSS = /\.css$/i;
-	function request(src){
-		var es;
+		let src = relyArr.shift();
+		if(!src) return execute();
+		loaded[src] = src;
+		
+		let es;
 		if(isCss(src)) {
 			es = doc.createElement('link');
 			es.rel = 'stylesheet';
 			es.type = 'text/css';
 			es.href = src;
 			head.appendChild(es);
-			return
+			return onload();
 		}
 		curReq = src;
 		es = doc.createElement('script');
@@ -79,9 +87,13 @@
 		return src + '.js';
 	}
 	function onload(e) {
-		this.onreadystatechange = this.onerror = this.onload = null;
-		head.removeChild(this);
-		if(!relyArr.length) {
+		if(e){
+			this.onreadystatechange = this.onerror = this.onload = null;
+			head.removeChild(this);
+		}
+		if(relyArr.length) {
+			preload();
+		} else {
 			curReq = null;
 			execute();
 		}
